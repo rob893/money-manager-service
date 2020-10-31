@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using MoneyManagerService.Startup.ApplicationBuilderExtensions;
 
 namespace MoneyManagerService.Startup
 {
@@ -35,6 +36,7 @@ namespace MoneyManagerService.Startup
             services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
             //services.AddDbContext<>(x => x.UseMySql)
             services.AddHangfireServices(Configuration);
+            services.AddSwaggerServices(Configuration);
 
             services.Configure<SwaggerSettings>(Configuration.GetSection("Swagger"));
         }
@@ -46,6 +48,8 @@ namespace MoneyManagerService.Startup
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseAndConfigureSwagger(env);
 
             app.UseHttpsRedirection();
 
@@ -62,7 +66,7 @@ namespace MoneyManagerService.Startup
                 });
             });
 
-            backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
+            // backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
         }
 
         private class DashboardAuthorizationFilter : IDashboardAuthorizationFilter

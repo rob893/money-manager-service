@@ -18,9 +18,10 @@ namespace MoneyManagerService.Middleware
             this.next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, IOptions<SwaggerSettings> swaggerAuthSettings)
+        public async Task InvokeAsync(HttpContext context, IOptions<SwaggerSettings> swaggerSettings)
         {
-            var settings = swaggerAuthSettings.Value.AuthSettings;
+            var settings = swaggerSettings.Value;
+            var authSettings = settings.AuthSettings;
 
             // Make sure we are hitting the swagger path
             if (context.Request.Path.StartsWithSegments("/swagger"))
@@ -31,7 +32,7 @@ namespace MoneyManagerService.Middleware
                     return;
                 }
 
-                if (!settings.RequireAuth)
+                if (!authSettings.RequireAuth)
                 {
                     await next.Invoke(context);
                     return;
@@ -51,7 +52,7 @@ namespace MoneyManagerService.Middleware
                     var password = decodedUsernamePassword.Split(':', 2)[1];
 
                     // Check if login is correct
-                    if (IsAuthorized(username, password, settings))
+                    if (IsAuthorized(username, password, authSettings))
                     {
                         await next.Invoke(context);
                         return;
@@ -70,10 +71,10 @@ namespace MoneyManagerService.Middleware
             }
         }
 
-        public bool IsAuthorized(string username, string password, SwaggerAuthSettings settings)
+        public bool IsAuthorized(string username, string password, SwaggerAuthSettings authSettings)
         {
             // Check that username and password are correct
-            return username.Equals(settings.Username, StringComparison.InvariantCultureIgnoreCase) && password.Equals(settings.Password);
+            return username.Equals(authSettings.Username, StringComparison.InvariantCultureIgnoreCase) && password.Equals(authSettings.Password);
         }
     }
 }
