@@ -1,11 +1,10 @@
 using System;
-using System.Data;
 using Hangfire;
 using Hangfire.MySql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MoneyManagerService.Startup.ServiceCollectionExtensions
+namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
 {
     public static class HangfireServiceCollectionExtensions
     {

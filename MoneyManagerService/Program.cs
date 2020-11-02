@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using MoneyManagerService.ApplicationStartup;
 using MoneyManagerService.Core;
 using MoneyManagerService.Data;
 
@@ -55,7 +56,7 @@ namespace MoneyManagerService
                 .ConfigureAppConfiguration((HostBuilderContext, config) => config.AddJsonFile("appsettings.Secrets.json", false, true))
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup.Startup>();
+                    webBuilder.UseStartup<Startup>();
                 });
         }
 

@@ -7,13 +7,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using MoneyManagerService.Extensions;
+using MoneyManagerService.Models.Settings;
 
-namespace MoneyManagerService.Startup.ServiceCollectionExtensions
+namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
 {
     public static class SwaggerServiceCollectionExtensions
     {
         public static IServiceCollection AddSwaggerServices(this IServiceCollection services, IConfiguration config)
         {
+            services.Configure<SwaggerSettings>(config.GetSection("Swagger"));
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc(

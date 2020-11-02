@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using MoneyManagerService.Constants;
 using MoneyManagerService.Middleware;
 
-namespace MoneyManagerService.Startup.ApplicationBuilderExtensions
+namespace MoneyManagerService.ApplicationStartup.ApplicationBuilderExtensions
 {
     public static class SwaggerApplicationBuilderExtensions
     {
