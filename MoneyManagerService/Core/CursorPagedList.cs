@@ -9,7 +9,9 @@ using MoneyManagerService.Models.QueryParameters;
 
 namespace MoneyManagerService.Core
 {
-    public class CursorPagedList<T> : List<T> where T : class, IIdentifiable
+    public class CursorPagedList<TEntity, TEntityKey> : List<TEntity>
+        where TEntity : class, IIdentifiable<TEntityKey>, new()
+        where TEntityKey : IEquatable<TEntityKey>, IComparable<TEntityKey>
     {
         public bool HasNextPage { get; set; }
         public bool HasPreviousPage { get; set; }
@@ -18,7 +20,7 @@ namespace MoneyManagerService.Core
         public int? TotalCount { get; set; }
 
 
-        public CursorPagedList(IEnumerable<T> items, bool hasNextPage, bool hasPreviousPage, string startCursor, string endCursor, int? totalCount)
+        public CursorPagedList(IEnumerable<TEntity> items, bool hasNextPage, bool hasPreviousPage, string startCursor, string endCursor, int? totalCount)
         {
             HasNextPage = hasNextPage;
             HasPreviousPage = hasPreviousPage;
@@ -28,7 +30,7 @@ namespace MoneyManagerService.Core
             AddRange(items);
         }
 
-        public static async Task<CursorPagedList<T>> CreateAsync(IQueryable<T> source, int? first, string after, int? last, string before, bool includeTotal = false)
+        public static async Task<CursorPagedList<TEntity, TEntityKey>> CreateAsync(IQueryable<TEntity> source, int? first, string after, int? last, string before, bool includeTotal = false)
         {
             if (first != null && last != null)
             {
@@ -46,10 +48,10 @@ namespace MoneyManagerService.Core
             {
                 var items = await source.OrderBy(item => item.Id).ToListAsync();
 
-                var startCursor = items.FirstOrDefault()?.Id.ConvertInt32ToBase64();
-                var endCursor = items.LastOrDefault()?.Id.ConvertInt32ToBase64();
+                var startCursor = items.FirstOrDefault()?.ConvertIdToBase64();
+                var endCursor = items.LastOrDefault()?.ConvertIdToBase64();
 
-                return new CursorPagedList<T>(items, false, false, startCursor, endCursor, totalCount);
+                return new CursorPagedList<TEntity, TEntityKey>(items, false, false, startCursor, endCursor, totalCount);
             }
 
             if (first != null)
@@ -77,7 +79,7 @@ namespace MoneyManagerService.Core
                 var startCursor = items.FirstOrDefault()?.Id.ConvertInt32ToBase64();
                 var endCursor = items.LastOrDefault()?.Id.ConvertInt32ToBase64();
 
-                return new CursorPagedList<T>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
+                return new CursorPagedList<TEntity, TEntityKey>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
             }
 
             if (last != null)
@@ -87,7 +89,13 @@ namespace MoneyManagerService.Core
                     throw new ArgumentException("last cannot be less than 0.");
                 }
 
-                var afterId = after == null ? int.MinValue : after.ConvertToInt32FromBase64();
+                if (after != null)
+                {
+                    var afterId = new TEntity().ConvertBase64StringToIdType(after);
+                    source = source.Where(item => item.Id.CompareTo(afterId) > 0);
+                }
+
+                // var afterId = after == null ? int.MinValue : after.ConvertToInt32FromBase64();
                 var beforeId = before == null ? int.MaxValue : before.ConvertToInt32FromBase64();
 
                 var items = await source.Where(item => item.Id > afterId && item.Id < beforeId)
@@ -107,13 +115,13 @@ namespace MoneyManagerService.Core
                 var startCursor = items.FirstOrDefault()?.Id.ConvertInt32ToBase64();
                 var endCursor = items.LastOrDefault()?.Id.ConvertInt32ToBase64();
 
-                return new CursorPagedList<T>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
+                return new CursorPagedList<TEntity, TEntityKey>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
             }
 
             throw new Exception("Error creating cursor paged list.");
         }
 
-        public static Task<CursorPagedList<T>> CreateAsync(IQueryable<T> source, CursorPaginationParameters searchParams)
+        public static Task<CursorPagedList<TEntity, TEntityKey>> CreateAsync(IQueryable<TEntity> source, CursorPaginationParameters searchParams)
         {
             return CreateAsync(source, searchParams.First, searchParams.After, searchParams.Last, searchParams.Before, searchParams.IncludeTotal);
         }
