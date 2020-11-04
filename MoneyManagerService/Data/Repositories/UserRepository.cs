@@ -56,21 +56,21 @@ namespace MoneyManagerService.Data.Repositories
             return result.Succeeded;
         }
 
-        public Task<CursorPagedList<Role>> GetRolesAsync(CursorPaginationParameters searchParams)
-        {
-            IQueryable<Role> query = context.Roles;
+        // public Task<CursorPagedList<Role, int>> GetRolesAsync(CursorPaginationParameters searchParams)
+        // {
+        //     IQueryable<Role> query = context.Roles;
 
-            return CursorPagedList<Role>.CreateAsync(query, searchParams);
-        }
+        //     return CursorPagedList<Role, int>.CreateAsync<Role, int>(query, searchParams, ConvertIdToBase64, ConvertBase64ToIdType, AddAfterExp, AddBeforeExp);
+        // }
 
         public Task<List<Role>> GetRolesAsync()
         {
             return context.Roles.ToListAsync();
         }
 
-        protected override IQueryable<User> AddIncludes(IQueryable<User> query)
-        {
-            return query.Include(user => user.UserRoles).ThenInclude(userRole => userRole.Role);
-        }
+        // protected override IQueryable<User> AddIncludes(IQueryable<User> query)
+        // {
+        //     return query.Include(user => user.UserRoles).ThenInclude(userRole => userRole.Role);
+        // }
     }
 }

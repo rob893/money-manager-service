@@ -7,16 +7,22 @@ using MoneyManagerService.Models.Domain;
 
 namespace MoneyManagerService.Models.Responses
 {
-    public class CursorPaginatedResponse<T> where T : class, IIdentifiable
+    public class CursorPaginatedResponse<TEntity, TEntityKey>
+        where TEntity : class, IIdentifiable<TEntityKey>
+        where TEntityKey : IEquatable<TEntityKey>, IComparable<TEntityKey>
     {
-        public IEnumerable<Edge<T>> Edges { get; set; }
-        public IEnumerable<T> Nodes { get; set; }
+        public IEnumerable<Edge<TEntity>> Edges { get; set; }
+        public IEnumerable<TEntity> Nodes { get; set; }
         public PageInfo PageInfo { get; set; }
         public int? TotalCount { get; set; }
 
+        private readonly Func<TEntityKey, string> ConvertIdToBase64;
 
-        public CursorPaginatedResponse(IEnumerable<T> items, string startCursor, string endCursor, bool hasNextPage, bool hasPreviousPage, int? totalCount)
+
+        public CursorPaginatedResponse(IEnumerable<TEntity> items, string startCursor, string endCursor, bool hasNextPage, bool hasPreviousPage, int? totalCount, Func<TEntityKey, string> ConvertIdToBase64)
         {
+            this.ConvertIdToBase64 = ConvertIdToBase64;
+
             SetEdges(items);
             Nodes = items.ToList();
             PageInfo = new PageInfo
@@ -29,10 +35,11 @@ namespace MoneyManagerService.Models.Responses
             TotalCount = totalCount;
         }
 
-        public CursorPaginatedResponse(CursorPagedList<T> items)
+        public CursorPaginatedResponse(CursorPagedList<TEntity, TEntityKey> items, Func<TEntityKey, string> ConvertIdToBase64)
         {
-            SetEdges(items);
+            this.ConvertIdToBase64 = ConvertIdToBase64;
 
+            SetEdges(items);
             Nodes = items.ToList();
             PageInfo = new PageInfo
             {
@@ -44,18 +51,20 @@ namespace MoneyManagerService.Models.Responses
             TotalCount = items.TotalCount;
         }
 
-        public static CursorPaginatedResponse<T> CreateFrom<TSource>(CursorPagedList<TSource> items, Func<IEnumerable<TSource>, IEnumerable<T>> mappingFunction) where TSource : class, IIdentifiable
+        public static CursorPaginatedResponse<TDestination, int> CreateFrom<TSource, TDestination>(CursorPagedList<TSource, int> items, Func<IEnumerable<TSource>, IEnumerable<TDestination>> mappingFunction)
+            where TSource : class, IIdentifiable<int>
+            where TDestination : class, IIdentifiable<int>
         {
             var mappedItems = mappingFunction(items);
 
-            return new CursorPaginatedResponse<T>(mappedItems, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount);
+            return new CursorPaginatedResponse<TDestination, int>(mappedItems, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount, Id => Convert.ToBase64String(BitConverter.GetBytes(Id)));
         }
 
-        private void SetEdges(IEnumerable<T> items)
+        private void SetEdges(IEnumerable<TEntity> items)
         {
-            Edges = items.Select(item => new Edge<T>
+            Edges = items.Select(item => new Edge<TEntity>
             {
-                Cursor = item.Id.ConvertInt32ToBase64(),
+                Cursor = ConvertIdToBase64(item.Id),
                 Node = item
             });
         }

@@ -11,16 +11,26 @@ using MoneyManagerService.Core;
 
 namespace MoneyManagerService.Data.Repositories
 {
-    public abstract class Repository<TEntity, RSearchParams>
-        where TEntity : class, IIdentifiable
+    public abstract class Repository<TEntity, TEntityKey, RSearchParams>
+        where TEntity : class, IIdentifiable<TEntityKey>
+        where TEntityKey : IEquatable<TEntityKey>, IComparable<TEntityKey>
         where RSearchParams : CursorPaginationParameters
     {
         protected readonly DataContext context;
 
+        private readonly Func<TEntityKey, string> ConvertIdToBase64;
+        private readonly Func<string, TEntityKey> ConvertBase64ToIdType;
+        private readonly Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddAfterExp;
+        private readonly Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddBeforeExp;
 
-        public Repository(DataContext context)
+        public Repository(DataContext context, Func<TEntityKey, string> ConvertIdToBase64, Func<string, TEntityKey> ConvertBase64ToIdType,
+            Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddAfterExp, Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddBeforeExp)
         {
             this.context = context;
+            this.ConvertIdToBase64 = ConvertIdToBase64;
+            this.ConvertBase64ToIdType = ConvertBase64ToIdType;
+            this.AddAfterExp = AddAfterExp;
+            this.AddBeforeExp = AddBeforeExp;
         }
 
         public EntityEntry<TEntity> Entry(TEntity entity)
@@ -54,52 +64,52 @@ namespace MoneyManagerService.Data.Repositories
             return await context.SaveChangesAsync() > 0;
         }
 
-        public Task<TEntity> GetByIdAsync(int id)
+        public Task<TEntity> GetByIdAsync(TEntityKey id)
         {
             IQueryable<TEntity> query = context.Set<TEntity>();
 
             query = AddIncludes(query);
 
-            return query.FirstOrDefaultAsync(e => e.Id == id);
+            return query.FirstOrDefaultAsync(e => e.Id.Equals(id));
         }
 
-        public Task<TEntity> GetByIdAsync(int id, params Expression<Func<TEntity, object>>[] includes)
-        {
-            IQueryable<TEntity> query = context.Set<TEntity>();
-
-            query = AddIncludes(query);
-            query = includes.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
-
-            return query.FirstOrDefaultAsync(e => e.Id == id);
-        }
-
-        public Task<CursorPagedList<TEntity>> SearchAsync(RSearchParams searchParams)
-        {
-            IQueryable<TEntity> query = context.Set<TEntity>();
-
-            query = AddIncludes(query);
-            query = AddWhereClauses(query, searchParams);
-
-            return CursorPagedList<TEntity>.CreateAsync(query, searchParams);
-        }
-
-        public Task<CursorPagedList<TEntity>> SearchAsync(IQueryable<TEntity> query, RSearchParams searchParams)
-        {
-            query = AddIncludes(query);
-            query = AddWhereClauses(query, searchParams);
-
-            return CursorPagedList<TEntity>.CreateAsync(query, searchParams);
-        }
-
-        public Task<CursorPagedList<TEntity>> SearchAsync(RSearchParams searchParams, params Expression<Func<TEntity, object>>[] includes)
+        public Task<TEntity> GetByIdAsync(TEntityKey id, params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = context.Set<TEntity>();
 
             query = AddIncludes(query);
             query = includes.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+
+            return query.FirstOrDefaultAsync(e => e.Id.Equals(id));
+        }
+
+        public Task<CursorPagedList<TEntity, TEntityKey>> SearchAsync(RSearchParams searchParams)
+        {
+            IQueryable<TEntity> query = context.Set<TEntity>();
+
+            query = AddIncludes(query);
             query = AddWhereClauses(query, searchParams);
 
-            return CursorPagedList<TEntity>.CreateAsync(query, searchParams);
+            return CursorPagedList<TEntity, TEntityKey>.CreateAsync(query, searchParams, ConvertIdToBase64, ConvertBase64ToIdType, AddAfterExp, AddBeforeExp);
+        }
+
+        public Task<CursorPagedList<TEntity, TEntityKey>> SearchAsync(IQueryable<TEntity> query, RSearchParams searchParams)
+        {
+            query = AddIncludes(query);
+            query = AddWhereClauses(query, searchParams);
+
+            return CursorPagedList<TEntity, TEntityKey>.CreateAsync(query, searchParams, ConvertIdToBase64, ConvertBase64ToIdType, AddAfterExp, AddBeforeExp);
+        }
+
+        public Task<CursorPagedList<TEntity, TEntityKey>> SearchAsync(RSearchParams searchParams, params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = context.Set<TEntity>();
+
+            query = AddIncludes(query);
+            query = includes.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+            query = AddWhereClauses(query, searchParams);
+
+            return CursorPagedList<TEntity, TEntityKey>.CreateAsync(query, searchParams, ConvertIdToBase64, ConvertBase64ToIdType, AddAfterExp, AddBeforeExp);
         }
 
         protected virtual IQueryable<TEntity> AddWhereClauses(IQueryable<TEntity> query, RSearchParams searchParams)
@@ -114,4 +124,52 @@ namespace MoneyManagerService.Data.Repositories
             return query;
         }
     }
+
+    public abstract class Repository<TEntity, RSearchParams> : Repository<TEntity, int, RSearchParams>
+        where TEntity : class, IIdentifiable<int>
+        where RSearchParams : CursorPaginationParameters
+    {
+        public Repository(DataContext context) : base(
+            context,
+            Id => Convert.ToBase64String(BitConverter.GetBytes(Id)),
+            str =>
+            {
+                try
+                {
+                    return BitConverter.ToInt32(Convert.FromBase64String(str), 0);
+                }
+                catch
+                {
+                    throw new ArgumentException($"{str} is not a valid base 64 encoded int32.");
+                }
+            },
+            (source, afterId) => source.Where(item => item.Id > afterId),
+            (source, beforeId) => source.Where(item => item.Id < beforeId)
+        )
+        { }
+    }
+
+    // public abstract class Repository<TEntity, RSearchParams> : Repository<TEntity, string, RSearchParams>
+    //     where TEntity : class, IIdentifiable<string>
+    //     where RSearchParams : CursorPaginationParameters
+    // {
+    //     public Repository(DataContext context) : base(
+    //         context,
+    //         Id => Convert.ToBase64String(BitConverter.GetBytes(Id)),
+    //         str =>
+    //         {
+    //             try
+    //             {
+    //                 return BitConverter.ToInt32(Convert.FromBase64String(str), 0);
+    //             }
+    //             catch
+    //             {
+    //                 throw new ArgumentException($"{str} is not a valid base 64 encoded int32.");
+    //             }
+    //         },
+    //         (source, afterId) => source.Where(item => item.Id > afterId),
+    //         (source, beforeId) => source.Where(item => item.Id < beforeId)
+    //     )
+    //     { }
+    // }
 }

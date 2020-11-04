@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using MoneyManagerService.Models.Domain;
 
 namespace MoneyManagerService.Models.DTOs
 {
-    public class UserForReturnDto : IIdentifiable
+    public class UserForReturnDto : IIdentifiable<int>
     {
         public int Id { get; set; }
         public string UserName { get; set; }

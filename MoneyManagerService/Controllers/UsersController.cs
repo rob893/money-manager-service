@@ -28,10 +28,10 @@ namespace MoneyManagerService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<CursorPaginatedResponse<UserForReturnDto>>> GetUsersAsync([FromQuery] CursorPaginationParameters searchParams)
+        public async Task<ActionResult<CursorPaginatedResponse<UserForReturnDto, int>>> GetUsersAsync([FromQuery] CursorPaginationParameters searchParams)
         {
             var users = await userRepository.SearchAsync(searchParams);
-            var paginatedResponse = CursorPaginatedResponse<UserForReturnDto>.CreateFrom(users, mapper.Map<IEnumerable<UserForReturnDto>>);
+            var paginatedResponse = CursorPaginatedResponse<UserForReturnDto, int>.CreateFrom(users, mapper.Map<IEnumerable<UserForReturnDto>>);
 
             return Ok(paginatedResponse);
         }
@@ -51,15 +51,15 @@ namespace MoneyManagerService.Controllers
             return Ok(userToReturn);
         }
 
-        [Authorize(Policy = "RequireAdminRole")]
-        [HttpGet("roles")]
-        public async Task<ActionResult<CursorPaginatedResponse<RoleForReturnDto>>> GetRolesAsync([FromQuery] CursorPaginationParameters searchParams)
-        {
-            var roles = await userRepository.GetRolesAsync(searchParams);
-            var paginatedResponse = CursorPaginatedResponse<RoleForReturnDto>.CreateFrom(roles, mapper.Map<IEnumerable<RoleForReturnDto>>);
+        // [Authorize(Policy = "RequireAdminRole")]
+        // [HttpGet("roles")]
+        // public async Task<ActionResult<CursorPaginatedResponse<RoleForReturnDto, int>>> GetRolesAsync([FromQuery] CursorPaginationParameters searchParams)
+        // {
+        //     var roles = await userRepository.GetRolesAsync(searchParams);
+        //     var paginatedResponse = CursorPaginatedResponse<RoleForReturnDto, int>.CreateFrom(roles, mapper.Map<IEnumerable<RoleForReturnDto>>);
 
-            return Ok(paginatedResponse);
-        }
+        //     return Ok(paginatedResponse);
+        // }
 
         [Authorize(Policy = "RequireAdminRole")]
         [HttpPost("{id}/roles")]

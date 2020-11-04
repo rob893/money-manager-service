@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace MoneyManagerService.Models.Domain
 {
-    public class User : IdentityUser<int>, IIdentifiable
+    public class User : IdentityUser<int>, IIdentifiable<int>
     {
         [Required]
         [MaxLength(255)]

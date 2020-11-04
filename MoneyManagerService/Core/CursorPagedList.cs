@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MoneyManagerService.Extensions;
@@ -10,7 +11,7 @@ using MoneyManagerService.Models.QueryParameters;
 namespace MoneyManagerService.Core
 {
     public class CursorPagedList<TEntity, TEntityKey> : List<TEntity>
-        where TEntity : class, IIdentifiable<TEntityKey>, new()
+        where TEntity : class, IIdentifiable<TEntityKey>
         where TEntityKey : IEquatable<TEntityKey>, IComparable<TEntityKey>
     {
         public bool HasNextPage { get; set; }
@@ -30,7 +31,10 @@ namespace MoneyManagerService.Core
             AddRange(items);
         }
 
-        public static async Task<CursorPagedList<TEntity, TEntityKey>> CreateAsync(IQueryable<TEntity> source, int? first, string after, int? last, string before, bool includeTotal = false)
+        public static async Task<CursorPagedList<T, R>> CreateAsync<T, R>(IQueryable<T> source, int? first, string after, int? last, string before, bool includeTotal,
+        Func<R, string> ConvertIdToBase64, Func<string, R> ConvertBase64ToIdType, Func<IQueryable<T>, R, IQueryable<T>> AddAfterExp, Func<IQueryable<T>, R, IQueryable<T>> AddBeforeExp)
+            where T : class, IIdentifiable<R>
+            where R : IEquatable<R>, IComparable<R>
         {
             if (first != null && last != null)
             {
@@ -48,10 +52,10 @@ namespace MoneyManagerService.Core
             {
                 var items = await source.OrderBy(item => item.Id).ToListAsync();
 
-                var startCursor = items.FirstOrDefault()?.ConvertIdToBase64();
-                var endCursor = items.LastOrDefault()?.ConvertIdToBase64();
+                var startCursor = ConvertIdToBase64(items.FirstOrDefault().Id);
+                var endCursor = ConvertIdToBase64(items.LastOrDefault().Id);
 
-                return new CursorPagedList<TEntity, TEntityKey>(items, false, false, startCursor, endCursor, totalCount);
+                return new CursorPagedList<T, R>(items, false, false, startCursor, endCursor, totalCount);
             }
 
             if (first != null)
@@ -61,12 +65,19 @@ namespace MoneyManagerService.Core
                     throw new ArgumentException("first cannot be less than 0.");
                 }
 
-                var afterId = after == null ? int.MinValue : after.ConvertToInt32FromBase64();
-                var beforeId = before == null ? int.MaxValue : before.ConvertToInt32FromBase64();
+                if (after != null)
+                {
+                    var afterId = ConvertBase64ToIdType(after);
+                    source = AddAfterExp(source, afterId);
+                }
 
-                var items = await source.Where(item => item.Id > afterId && item.Id < beforeId)
-                    .OrderBy(item => item.Id)
-                    .Take(first.Value + 1).ToListAsync();
+                if (before != null)
+                {
+                    var beforeId = ConvertBase64ToIdType(before);
+                    source = AddBeforeExp(source, beforeId);
+                }
+
+                var items = await source.OrderBy(item => item.Id).Take(first.Value + 1).ToListAsync();
 
                 var hasNextPage = items.Count >= first.Value + 1;
                 var hasPreviousPage = after != null;
@@ -76,10 +87,10 @@ namespace MoneyManagerService.Core
                     items.RemoveAt(items.Count - 1);
                 }
 
-                var startCursor = items.FirstOrDefault()?.Id.ConvertInt32ToBase64();
-                var endCursor = items.LastOrDefault()?.Id.ConvertInt32ToBase64();
+                var startCursor = ConvertIdToBase64(items.FirstOrDefault().Id);
+                var endCursor = ConvertIdToBase64(items.LastOrDefault().Id);
 
-                return new CursorPagedList<TEntity, TEntityKey>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
+                return new CursorPagedList<T, R>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
             }
 
             if (last != null)
@@ -91,16 +102,17 @@ namespace MoneyManagerService.Core
 
                 if (after != null)
                 {
-                    var afterId = new TEntity().ConvertBase64StringToIdType(after);
-                    source = source.Where(item => item.Id.CompareTo(afterId) > 0);
+                    var afterId = ConvertBase64ToIdType(after);
+                    source = AddAfterExp(source, afterId);
                 }
 
-                // var afterId = after == null ? int.MinValue : after.ConvertToInt32FromBase64();
-                var beforeId = before == null ? int.MaxValue : before.ConvertToInt32FromBase64();
+                if (before != null)
+                {
+                    var beforeId = ConvertBase64ToIdType(before);
+                    source = AddBeforeExp(source, beforeId);
+                }
 
-                var items = await source.Where(item => item.Id > afterId && item.Id < beforeId)
-                    .OrderByDescending(item => item.Id)
-                    .Take(last.Value + 1).ToListAsync();
+                var items = await source.OrderByDescending(item => item.Id).Take(last.Value + 1).ToListAsync();
 
                 var hasNextPage = before != null;
                 var hasPreviousPage = items.Count >= last.Value + 1;
@@ -112,18 +124,48 @@ namespace MoneyManagerService.Core
 
                 items.Reverse();
 
-                var startCursor = items.FirstOrDefault()?.Id.ConvertInt32ToBase64();
-                var endCursor = items.LastOrDefault()?.Id.ConvertInt32ToBase64();
+                var startCursor = ConvertIdToBase64(items.FirstOrDefault().Id);
+                var endCursor = ConvertIdToBase64(items.LastOrDefault().Id);
 
-                return new CursorPagedList<TEntity, TEntityKey>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
+                return new CursorPagedList<T, R>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
             }
 
             throw new Exception("Error creating cursor paged list.");
         }
 
-        public static Task<CursorPagedList<TEntity, TEntityKey>> CreateAsync(IQueryable<TEntity> source, CursorPaginationParameters searchParams)
+        // public static Task<CursorPagedList<T, int>> CreateAsync<T>(IQueryable<T> source, int? first, string after, int? last, string before, bool includeTotal = false)
+        //     where T : class, IIdentifiable<int>
+        // {
+        //     return CreateAsync(source, first, after, last, before, includeTotal,
+        //         Id => Convert.ToBase64String(BitConverter.GetBytes(Id)),
+        //         str =>
+        //         {
+        //             try
+        //             {
+        //                 return BitConverter.ToInt32(Convert.FromBase64String(str), 0);
+        //             }
+        //             catch
+        //             {
+        //                 throw new ArgumentException($"{str} is not a valid base 64 encoded int32.");
+        //             }
+        //         },
+        //         (item, afterId) => item.Id > afterId,
+        //         (item, beforeId) => item.Id < beforeId
+        //     );
+        // }
+
+        // public static Task<CursorPagedList<T, int>> CreateAsync<T>(IQueryable<T> source, CursorPaginationParameters searchParams)
+        //     where T : class, IIdentifiable<int>
+        // {
+        //     return CreateAsync(source, searchParams.First, searchParams.After, searchParams.Last, searchParams.Before, searchParams.IncludeTotal);
+        // }
+
+        public static Task<CursorPagedList<T, R>> CreateAsync<T, R>(IQueryable<T> source, CursorPaginationParameters searchParams,
+            Func<R, string> ConvertIdToBase64, Func<string, R> ConvertBase64ToIdType, Func<IQueryable<T>, R, IQueryable<T>> AddAfterExp, Func<IQueryable<T>, R, IQueryable<T>> AddBeforeExp)
+            where T : class, IIdentifiable<R>
+            where R : IEquatable<R>, IComparable<R>
         {
-            return CreateAsync(source, searchParams.First, searchParams.After, searchParams.Last, searchParams.Before, searchParams.IncludeTotal);
+            return CreateAsync(source, searchParams.First, searchParams.After, searchParams.Last, searchParams.Before, searchParams.IncludeTotal, ConvertIdToBase64, ConvertBase64ToIdType, AddAfterExp, AddBeforeExp);
         }
     }
 }

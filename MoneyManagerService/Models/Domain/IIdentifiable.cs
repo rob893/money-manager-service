@@ -6,8 +6,6 @@ namespace MoneyManagerService.Models.Domain
     public interface IIdentifiable<TKey> where TKey : IEquatable<TKey>, IComparable<TKey>
     {
         TKey Id { get; set; }
-        TKey ConvertBase64StringToIdType(string str);
-        string ConvertIdToBase64();
     }
 
     public abstract class IntIdentifiable : IIdentifiable<int>
@@ -45,7 +43,7 @@ namespace MoneyManagerService.Models.Domain
         {
             try
             {
-                return BitConverter.ToString(Convert.FromBase64String(str), 0);
+                return Encoding.UTF8.GetString(Convert.FromBase64String(str));
             }
             catch
             {
