@@ -32,9 +32,10 @@ namespace MoneyManagerService.ApplicationStartup
                 .AddAuthenticationServices(Configuration)
                 .AddIdentityServices()
                 .AddRepositoryServices()
+                .AddAlphaVantageServices(Configuration)
                 .AddHangfireServices(Configuration)
                 .AddSwaggerServices(Configuration)
-                .AddAutoMapper(Assembly.GetExecutingAssembly())
+                .AddAutoMapper(typeof(Startup))
                 .AddHealthCheckServices()
                 .AddCors();
         }
