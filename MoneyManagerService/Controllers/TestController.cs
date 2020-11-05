@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using MoneyManagerService.Services;
 using System.Threading.Tasks;
+using MoneyManagerService.Models.Domain;
 
 namespace MoneyManagerService.Controllers
 {
@@ -18,11 +20,11 @@ namespace MoneyManagerService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<dynamic>> GetDailyAdjustedTimeSeriesAsync([FromQuery] string ticker)
+        public async Task<ActionResult<IEnumerable<TickerTimeSeries>>> GetDailyAdjustedTimeSeriesAsync([FromQuery] string ticker)
         {
             var result = await alphaVantageService.GetDailyAdjustedTimeSeries(ticker);
 
-            return result;
+            return Ok(result);
         }
     }
 }

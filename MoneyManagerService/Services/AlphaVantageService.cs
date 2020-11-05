@@ -6,6 +6,8 @@ using Microsoft.Extensions.Options;
 using MoneyManagerService.Models.Settings;
 using System.Text.Json;
 using Newtonsoft.Json;
+using MoneyManagerService.Models.Domain;
+using System.Linq;
 
 namespace MoneyManagerService.Services
 {
@@ -22,35 +24,26 @@ namespace MoneyManagerService.Services
             this.httpClient.BaseAddress = new Uri(this.settings.BaseUrl);
         }
 
-        public async Task<List<dynamic>> GetDailyAdjustedTimeSeries(string ticker)
+        public async Task<IEnumerable<TickerTimeSeries>> GetDailyAdjustedTimeSeries(string ticker)
         {
-            using var res = await httpClient.GetAsync($"/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&apikey={settings.ApiKey}");
+            using var res = await httpClient.GetAsync($"/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&outputsize=full&apikey={settings.ApiKey}");
             var resStream = await res.Content.ReadAsStringAsync();
-            var content = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(resStream);
+            var content = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, dynamic>>>(resStream);
 
             var timeSeries = content["Time Series (Daily)"];
 
-            var things = new List<dynamic>();
-
-            foreach (var entry in timeSeries)
+            return timeSeries.Select(entry => new TickerTimeSeries
             {
-                things.Add(new
-                {
-                    date = entry.Key
-                });
-            }
-
-            //             Object.keys(timeSeries).forEach(key => {
-            //     things.push({
-            //         date: new Date(key),
-            //         open: Number(timeSeries[key]['1. open']),
-            //         close: Number(timeSeries[key]['4. close']),
-            //         change: 0,
-            //         dividend: Number(timeSeries[key]['7. dividend amount'])
-            //     });
-            // });
-
-            return things;
+                Ticker = ticker,
+                Date = DateTime.Parse(entry.Key),
+                Open = double.Parse(entry.Value["1. open"].Value),
+                High = double.Parse(entry.Value["2. high"].Value),
+                Low = double.Parse(entry.Value["3. low"].Value),
+                Close = double.Parse(entry.Value["4. close"].Value),
+                AdjustedClose = double.Parse(entry.Value["5. adjusted close"].Value),
+                Volume = double.Parse(entry.Value["6. volume"].Value),
+                DividendAmount = double.Parse(entry.Value["7. dividend amount"].Value)
+            });
         }
     }
 }

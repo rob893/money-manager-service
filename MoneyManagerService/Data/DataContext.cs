@@ -10,6 +10,7 @@ namespace MoneyManagerService.Data
         IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<TickerTimeSeries> TickerTimeSeries { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
@@ -35,6 +36,11 @@ namespace MoneyManagerService.Data
             modelBuilder.Entity<RefreshToken>(rToken =>
             {
                 rToken.HasKey(k => k.UserId);
+            });
+
+            modelBuilder.Entity<TickerTimeSeries>(tickerTimeSeries =>
+            {
+                tickerTimeSeries.HasIndex(tss => new { tss.Ticker, tss.Date });
             });
         }
     }
