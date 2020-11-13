@@ -3,7 +3,10 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using MoneyManagerService.Extensions;
+using MoneyManagerService.Constants;
 using MoneyManagerService.Models.Settings;
 
 namespace MoneyManagerService.Middleware
@@ -18,17 +21,17 @@ namespace MoneyManagerService.Middleware
             this.next = next;
         }
 
-        public async Task InvokeAsync(HttpContext context, IOptions<SwaggerSettings> swaggerSettings)
+        public async Task InvokeAsync(HttpContext context, IOptions<SwaggerSettings> swaggerSettings, IConfiguration config)
         {
             var settings = swaggerSettings.Value;
             var authSettings = settings.AuthSettings;
 
             // Make sure we are hitting the swagger path
-            if (context.Request.Path.StartsWithSegments("/swagger"))
+            if (context.Request.Path.StartsWithSegments("/swagger") && config.GetEnvironment().Equals(ServiceEnvironment.Production, StringComparison.OrdinalIgnoreCase))
             {
                 if (!settings.Enabled)
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                     return;
                 }
 
@@ -71,7 +74,7 @@ namespace MoneyManagerService.Middleware
             }
         }
 
-        public bool IsAuthorized(string username, string password, SwaggerAuthSettings authSettings)
+        public static bool IsAuthorized(string username, string password, SwaggerAuthSettings authSettings)
         {
             // Check that username and password are correct
             return username.Equals(authSettings.Username, StringComparison.InvariantCultureIgnoreCase) && password.Equals(authSettings.Password);

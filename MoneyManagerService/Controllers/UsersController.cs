@@ -81,7 +81,7 @@ namespace MoneyManagerService.Controllers
                 return selectedRoles.Contains(upperName) && !userRoles.Contains(upperName);
             });
 
-            if (rolesToAdd.Count() == 0)
+            if (!rolesToAdd.Any())
             {
                 return Ok(mapper.Map<UserForReturnDto>(user));
             }
@@ -123,7 +123,7 @@ namespace MoneyManagerService.Controllers
                 return selectedRoles.Contains(upperName) && userRoles.Contains(upperName);
             }).Select(role => role.Id).ToHashSet();
 
-            if (roleIdsToRemove.Count() == 0)
+            if (roleIdsToRemove.Count == 0)
             {
                 return Ok(mapper.Map<UserForReturnDto>(user));
             }

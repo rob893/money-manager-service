@@ -17,7 +17,7 @@ namespace MoneyManagerService.Models.Domain
             return Convert.ToBase64String(BitConverter.GetBytes(Id));
         }
 
-        public int ConvertBase64StringToIdType(string str)
+        public static int ConvertBase64StringToIdType(string str)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace MoneyManagerService.Models.Domain
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(Id));
         }
 
-        public string ConvertBase64StringToIdType(string str)
+        public static string ConvertBase64StringToIdType(string str)
         {
             try
             {

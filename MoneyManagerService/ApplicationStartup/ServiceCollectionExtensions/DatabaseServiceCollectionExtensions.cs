@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MoneyManagerService.Data;
+using MoneyManagerService.Models.Settings;
 
 namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
 {
@@ -9,7 +10,28 @@ namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
     {
         public static IServiceCollection AddDatabaseServices(this IServiceCollection services, IConfiguration config)
         {
-            services.AddDbContext<DataContext>(x => x.UseMySql(config.GetConnectionString("DefaultConnection"), options => options.EnableRetryOnFailure()));
+            services.Configure<MySQLSettings>(config.GetSection("MySQL"));
+
+            var settings = config.GetSection("MySQL").Get<MySQLSettings>();
+
+            services.AddDbContext<DataContext>(
+                dbContextOptions =>
+                {
+                    dbContextOptions
+                        .UseMySql(settings.DefaultConnection, ServerVersion.AutoDetect(settings.DefaultConnection), options => options.EnableRetryOnFailure());
+
+                    if (settings.EnableDetailedErrors)
+                    {
+                        dbContextOptions.EnableDetailedErrors();
+                    }
+
+                    if (settings.EnableSensitiveDataLogging)
+                    {
+                        dbContextOptions.EnableSensitiveDataLogging();
+                    }
+                }
+            );
+
             services.AddTransient<Seeder>();
 
             return services;

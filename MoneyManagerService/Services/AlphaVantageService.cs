@@ -19,7 +19,7 @@ namespace MoneyManagerService.Services
         public AlphaVantageService(HttpClient httpClient, IOptions<AlphaVantageSettings> settings)
         {
             this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            this.settings = settings.Value ?? throw new ArgumentNullException(nameof(AlphaVantageSettings));
+            this.settings = settings.Value ?? throw new ArgumentNullException(nameof(settings));
 
             this.httpClient.BaseAddress = new Uri(this.settings.BaseUrl);
         }

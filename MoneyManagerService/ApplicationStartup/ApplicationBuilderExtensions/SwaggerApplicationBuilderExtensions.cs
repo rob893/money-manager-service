@@ -26,7 +26,7 @@ namespace MoneyManagerService.ApplicationStartup.ApplicationBuilderExtensions
             {
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint($"../{Settings.SwaggerDocV1Endpoint}", FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName);
+                    c.SwaggerEndpoint($"..{Settings.SwaggerDocV1Endpoint}", FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName);
                 });
             }
 

@@ -7,6 +7,7 @@ using Hangfire;
 using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using MoneyManagerService.Constants;
 using MoneyManagerService.Extensions;
 
 namespace MoneyManagerService.ApplicationStartup.ApplicationBuilderExtensions
@@ -40,6 +41,11 @@ namespace MoneyManagerService.ApplicationStartup.ApplicationBuilderExtensions
 
             public bool Authorize(DashboardContext context)
             {
+                if (!configuration.GetEnvironment().Equals(ServiceEnvironment.Production, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
                 var httpContext = context.GetHttpContext();
 
                 string authHeader = httpContext.Request.Headers["Authorization"];
