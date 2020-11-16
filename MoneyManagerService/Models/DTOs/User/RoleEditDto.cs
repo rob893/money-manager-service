@@ -1,7 +1,7 @@
 namespace MoneyManagerService.Models.DTOs
 {
-    public class RoleEditDto
+    public record RoleEditDto
     {
-        public string[] RoleNames { get; set; }
+        public string[] RoleNames { get; init; }
     }
 }

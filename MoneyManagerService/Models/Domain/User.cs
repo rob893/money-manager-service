@@ -15,6 +15,7 @@ namespace MoneyManagerService.Models.Domain
         public string LastName { get; set; }
         public DateTimeOffset Created { get; set; }
         public RefreshToken RefreshToken { get; set; }
-        public List<UserRole> UserRoles { get; set; }
+        public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public List<Budget> Budgets { get; set; } = new List<Budget>();
     }
 }

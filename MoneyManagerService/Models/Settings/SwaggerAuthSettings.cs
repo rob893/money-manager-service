@@ -1,9 +1,9 @@
 namespace MoneyManagerService.Models.Settings
 {
-    public class SwaggerAuthSettings
+    public record SwaggerAuthSettings
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public bool RequireAuth { get; set; }
+        public string Username { get; init; }
+        public string Password { get; init; }
+        public bool RequireAuth { get; init; }
     }
 }

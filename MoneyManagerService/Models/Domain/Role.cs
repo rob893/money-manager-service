@@ -5,6 +5,6 @@ namespace MoneyManagerService.Models.Domain
 {
     public class Role : IdentityRole<int>, IIdentifiable<int>
     {
-        public List<UserRole> UserRoles { get; set; }
+        public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
     }
 }

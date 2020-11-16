@@ -17,11 +17,10 @@ namespace MoneyManagerService.Data.Repositories
         where RSearchParams : CursorPaginationParameters
     {
         protected readonly DataContext context;
-
-        private readonly Func<TEntityKey, string> ConvertIdToBase64;
-        private readonly Func<string, TEntityKey> ConvertBase64ToIdType;
-        private readonly Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddAfterExp;
-        private readonly Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddBeforeExp;
+        protected readonly Func<TEntityKey, string> ConvertIdToBase64;
+        protected readonly Func<string, TEntityKey> ConvertBase64ToIdType;
+        protected readonly Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddAfterExp;
+        protected readonly Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddBeforeExp;
 
         public Repository(DataContext context, Func<TEntityKey, string> ConvertIdToBase64, Func<string, TEntityKey> ConvertBase64ToIdType,
             Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddAfterExp, Func<IQueryable<TEntity>, TEntityKey, IQueryable<TEntity>> AddBeforeExp)
@@ -148,28 +147,4 @@ namespace MoneyManagerService.Data.Repositories
         )
         { }
     }
-
-    // public abstract class Repository<TEntity, RSearchParams> : Repository<TEntity, string, RSearchParams>
-    //     where TEntity : class, IIdentifiable<string>
-    //     where RSearchParams : CursorPaginationParameters
-    // {
-    //     public Repository(DataContext context) : base(
-    //         context,
-    //         Id => Convert.ToBase64String(BitConverter.GetBytes(Id)),
-    //         str =>
-    //         {
-    //             try
-    //             {
-    //                 return BitConverter.ToInt32(Convert.FromBase64String(str), 0);
-    //             }
-    //             catch
-    //             {
-    //                 throw new ArgumentException($"{str} is not a valid base 64 encoded int32.");
-    //             }
-    //         },
-    //         (source, afterId) => source.Where(item => item.Id > afterId),
-    //         (source, beforeId) => source.Where(item => item.Id < beforeId)
-    //     )
-    //     { }
-    // }
 }

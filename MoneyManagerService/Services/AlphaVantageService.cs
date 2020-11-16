@@ -4,7 +4,6 @@ using System;
 using System.Net.Http;
 using Microsoft.Extensions.Options;
 using MoneyManagerService.Models.Settings;
-using System.Text.Json;
 using Newtonsoft.Json;
 using MoneyManagerService.Models.Domain;
 using System.Linq;
@@ -27,8 +26,8 @@ namespace MoneyManagerService.Services
         public async Task<IEnumerable<TickerTimeSeries>> GetDailyAdjustedTimeSeries(string ticker)
         {
             using var res = await httpClient.GetAsync($"/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={ticker}&outputsize=full&apikey={settings.ApiKey}");
-            var resStream = await res.Content.ReadAsStringAsync();
-            var content = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, dynamic>>>(resStream);
+            var resContent = await res.Content.ReadAsStringAsync();
+            var content = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, dynamic>>>(resContent);
 
             var timeSeries = content["Time Series (Daily)"];
 

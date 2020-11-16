@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MoneyManagerService.Models.DTOs
 {
-    public class UserForLoginDto
+    public record UserForLoginDto
     {
         [Required]
-        public string Username { get; set; }
+        public string Username { get; init; }
         [Required]
-        public string Password { get; set; }
+        public string Password { get; init; }
     }
 }

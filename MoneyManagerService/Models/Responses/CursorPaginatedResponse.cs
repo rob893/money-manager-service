@@ -60,6 +60,12 @@ namespace MoneyManagerService.Models.Responses
             return new CursorPaginatedResponse<TDestination, int>(mappedItems, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount, Id => Convert.ToBase64String(BitConverter.GetBytes(Id)));
         }
 
+        public static CursorPaginatedResponse<TSource, int> CreateFrom<TSource>(CursorPagedList<TSource, int> items)
+            where TSource : class, IIdentifiable<int>
+        {
+            return new CursorPaginatedResponse<TSource, int>(items, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount, Id => Convert.ToBase64String(BitConverter.GetBytes(Id)));
+        }
+
         private void SetEdges(IEnumerable<TEntity> items)
         {
             Edges = items.Select(item => new Edge<TEntity>
@@ -68,6 +74,21 @@ namespace MoneyManagerService.Models.Responses
                 Node = item
             });
         }
+    }
+
+    public class CursorPaginatedResponse<TEntity> : CursorPaginatedResponse<TEntity, int>
+        where TEntity : class, IIdentifiable<int>
+    {
+        public CursorPaginatedResponse(IEnumerable<TEntity> items, string startCursor, string endCursor, bool hasNextPage, bool hasPreviousPage, int? totalCount) : base(
+            items,
+            startCursor,
+            endCursor,
+            hasNextPage,
+            hasPreviousPage,
+            totalCount,
+            Id => Convert.ToBase64String(BitConverter.GetBytes(Id))
+        )
+        { }
     }
 
     public class Edge<T>

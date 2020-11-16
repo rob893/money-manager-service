@@ -11,6 +11,8 @@ namespace MoneyManagerService.Data
     {
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<TickerTimeSeries> TickerTimeSeries { get; set; }
+        public DbSet<Budget> Budgets { get; set; }
+        public DbSet<Expense> Expenses { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
@@ -42,6 +44,10 @@ namespace MoneyManagerService.Data
             {
                 tickerTimeSeries.HasIndex(tss => new { tss.Ticker, tss.Date });
             });
+
+            modelBuilder.Entity<Expense>()
+                .Property(expense => expense.Frequency)
+                .HasConversion<string>();
         }
     }
 }

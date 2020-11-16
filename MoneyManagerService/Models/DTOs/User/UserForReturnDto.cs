@@ -1,18 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using MoneyManagerService.Models.Domain;
 
 namespace MoneyManagerService.Models.DTOs
 {
-    public class UserForReturnDto : IIdentifiable<int>
+    public record UserForReturnDto : IIdentifiable<int>
     {
         public int Id { get; set; }
-        public string UserName { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Email { get; set; }
-        public DateTimeOffset Created { get; set; }
-        public IEnumerable<string> Roles { get; set; }
+        public string UserName { get; init; }
+        public string FirstName { get; init; }
+        public string LastName { get; init; }
+        public string Email { get; init; }
+        public DateTimeOffset Created { get; init; }
+        public IEnumerable<string> Roles { get; init; }
     }
 }

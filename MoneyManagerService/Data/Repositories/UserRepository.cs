@@ -68,9 +68,9 @@ namespace MoneyManagerService.Data.Repositories
             return context.Roles.ToListAsync();
         }
 
-        // protected override IQueryable<User> AddIncludes(IQueryable<User> query)
-        // {
-        //     return query.Include(user => user.UserRoles).ThenInclude(userRole => userRole.Role);
-        // }
+        protected override IQueryable<User> AddIncludes(IQueryable<User> query)
+        {
+            return query.Include(user => user.UserRoles).ThenInclude(userRole => userRole.Role);
+        }
     }
 }

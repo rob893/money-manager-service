@@ -133,32 +133,32 @@ namespace MoneyManagerService.Core
             throw new Exception("Error creating cursor paged list.");
         }
 
-        // public static Task<CursorPagedList<T, int>> CreateAsync<T>(IQueryable<T> source, int? first, string after, int? last, string before, bool includeTotal = false)
-        //     where T : class, IIdentifiable<int>
-        // {
-        //     return CreateAsync(source, first, after, last, before, includeTotal,
-        //         Id => Convert.ToBase64String(BitConverter.GetBytes(Id)),
-        //         str =>
-        //         {
-        //             try
-        //             {
-        //                 return BitConverter.ToInt32(Convert.FromBase64String(str), 0);
-        //             }
-        //             catch
-        //             {
-        //                 throw new ArgumentException($"{str} is not a valid base 64 encoded int32.");
-        //             }
-        //         },
-        //         (item, afterId) => item.Id > afterId,
-        //         (item, beforeId) => item.Id < beforeId
-        //     );
-        // }
+        public static Task<CursorPagedList<T, int>> CreateAsync<T>(IQueryable<T> source, int? first, string after, int? last, string before, bool includeTotal = false)
+            where T : class, IIdentifiable<int>
+        {
+            return CreateAsync(source, first, after, last, before, includeTotal,
+                Id => Convert.ToBase64String(BitConverter.GetBytes(Id)),
+                str =>
+                {
+                    try
+                    {
+                        return BitConverter.ToInt32(Convert.FromBase64String(str), 0);
+                    }
+                    catch
+                    {
+                        throw new ArgumentException($"{str} is not a valid base 64 encoded int32.");
+                    }
+                },
+                (source, afterId) => source.Where(item => item.Id > afterId),
+                (source, beforeId) => source.Where(item => item.Id < beforeId)
+            );
+        }
 
-        // public static Task<CursorPagedList<T, int>> CreateAsync<T>(IQueryable<T> source, CursorPaginationParameters searchParams)
-        //     where T : class, IIdentifiable<int>
-        // {
-        //     return CreateAsync(source, searchParams.First, searchParams.After, searchParams.Last, searchParams.Before, searchParams.IncludeTotal);
-        // }
+        public static Task<CursorPagedList<T, int>> CreateAsync<T>(IQueryable<T> source, CursorPaginationParameters searchParams)
+            where T : class, IIdentifiable<int>
+        {
+            return CreateAsync(source, searchParams.First, searchParams.After, searchParams.Last, searchParams.Before, searchParams.IncludeTotal);
+        }
 
         public static Task<CursorPagedList<T, R>> CreateAsync<T, R>(IQueryable<T> source, CursorPaginationParameters searchParams,
             Func<R, string> ConvertIdToBase64, Func<string, R> ConvertBase64ToIdType, Func<IQueryable<T>, R, IQueryable<T>> AddAfterExp, Func<IQueryable<T>, R, IQueryable<T>> AddBeforeExp)
@@ -167,5 +167,19 @@ namespace MoneyManagerService.Core
         {
             return CreateAsync(source, searchParams.First, searchParams.After, searchParams.Last, searchParams.Before, searchParams.IncludeTotal, ConvertIdToBase64, ConvertBase64ToIdType, AddAfterExp, AddBeforeExp);
         }
+    }
+
+    public class CursorPagedList<TEntity> : CursorPagedList<TEntity, int>
+        where TEntity : class, IIdentifiable<int>
+    {
+        public CursorPagedList(IEnumerable<TEntity> items, bool hasNextPage, bool hasPreviousPage, string startCursor, string endCursor, int? totalCount) : base(
+            items,
+            hasNextPage,
+            hasPreviousPage,
+            startCursor,
+            endCursor,
+            totalCount
+        )
+        { }
     }
 }

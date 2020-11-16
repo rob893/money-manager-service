@@ -14,7 +14,6 @@ using System.Linq;
 using MoneyManagerService.Models.DTOs;
 using MoneyManagerService.Models.Domain;
 using MoneyManagerService.Models.Settings;
-using MoneyManagerService.Core;
 using MoneyManagerService.Data.Repositories;
 
 namespace MoneyManagerService.Controllers
@@ -22,7 +21,7 @@ namespace MoneyManagerService.Controllers
     [AllowAnonymous]
     [Route("[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : ServiceControllerBase
     {
         private readonly UserRepository userRepository;
         private readonly AuthenticationSettings authSettings;
@@ -47,7 +46,7 @@ namespace MoneyManagerService.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest(new ProblemDetailsWithErrors(result.Errors.Select(e => e.Description).ToList(), 400, Request));
+                return BadRequest(result.Errors.Select(e => e.Description).ToList());
             }
 
             return CreatedAtRoute("GetUserAsync", new { controller = "Users", id = userToCreate.Id }, userToReturn);
@@ -65,14 +64,14 @@ namespace MoneyManagerService.Controllers
 
             if (user == null)
             {
-                return Unauthorized(new ProblemDetailsWithErrors("Invalid username or password.", 401, Request));
+                return Unauthorized("Invalid username or password.");
             }
 
             var result = await userRepository.CheckPasswordAsync(user, userForLoginDto.Password);
 
             if (!result)
             {
-                return Unauthorized(new ProblemDetailsWithErrors("Invalid username or password.", 401, Request));
+                return Unauthorized("Invalid username or password.");
             }
 
             var token = GenerateJwtToken(user);
@@ -122,26 +121,26 @@ namespace MoneyManagerService.Controllers
             }
             catch (Exception e)
             {
-                return Unauthorized(new ProblemDetailsWithErrors(e.Message, 401, Request));
+                return Unauthorized(e.Message);
             }
 
             var userIdClaim = tokenClaims.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
             {
-                return Unauthorized(new ProblemDetailsWithErrors("Invalid token.", 401, Request));
+                return Unauthorized("Invalid token.");
             }
 
             var user = await userRepository.GetByIdAsync(userId, user => user.RefreshToken);
 
             if (user == null)
             {
-                return Unauthorized(new ProblemDetailsWithErrors("Invalid token.", 401, Request));
+                return Unauthorized("Invalid token.");
             }
 
             if (user.RefreshToken == null || user.RefreshToken.Token != refreshTokenDto.RefreshToken || DateTimeOffset.UtcNow > user.RefreshToken.Expiration)
             {
-                return Unauthorized(new ProblemDetailsWithErrors("Invalid token.", 401, Request));
+                return Unauthorized("Invalid token.");
             }
 
             var token = GenerateJwtToken(user);

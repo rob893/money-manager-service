@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MoneyManagerService.Models.DTOs
 {
-    public class RefreshTokenDto
+    public record RefreshTokenDto
     {
         [Required]
-        public string Token { get; set; }
+        public string Token { get; init; }
         [Required]
-        public string RefreshToken { get; set; }
+        public string RefreshToken { get; init; }
     }
 }

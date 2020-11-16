@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace MoneyManagerService.Core
 {
@@ -76,7 +77,7 @@ namespace MoneyManagerService.Core
             Detail = errors.Count > 0 ? errors[0] : "Unknown error.";
             Status = statusCode;
             Title = errorTitles.ContainsKey(statusCode) ? errorTitles[statusCode] : "There was an error.";
-            Instance = request != null ? $"{request.Method}: {request.Path}" : "";
+            Instance = request != null ? $"{request.Method}: {request.GetDisplayUrl()}" : "";
             Type = errorTypes.ContainsKey(statusCode) ? errorTypes[statusCode] : "https://tools.ietf.org/html/rfc7231";
         }
     }

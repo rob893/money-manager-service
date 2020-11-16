@@ -11,6 +11,7 @@ using HealthChecks.UI.Client;
 using AutoMapper;
 using Microsoft.AspNetCore.HttpOverrides;
 using MoneyManagerService.Middleware;
+using MoneyManagerService.Services;
 
 namespace MoneyManagerService.ApplicationStartup
 {
@@ -33,6 +34,7 @@ namespace MoneyManagerService.ApplicationStartup
                 .AddIdentityServices()
                 .AddRepositoryServices()
                 .AddAlphaVantageServices(Configuration)
+                .AddTaxeeServices(Configuration)
                 .AddHangfireServices(Configuration)
                 .AddSwaggerServices(Configuration)
                 .AddAutoMapper(typeof(Startup))

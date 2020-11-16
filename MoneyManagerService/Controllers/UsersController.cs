@@ -7,7 +7,6 @@ using System.Linq;
 using MoneyManagerService.Data.Repositories;
 using MoneyManagerService.Models.QueryParameters;
 using MoneyManagerService.Models.DTOs;
-using MoneyManagerService.Core;
 using MoneyManagerService.Models.Responses;
 using MoneyManagerService.Models.Domain;
 
@@ -15,7 +14,7 @@ namespace MoneyManagerService.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController : ServiceControllerBase
     {
         private readonly UserRepository userRepository;
         private readonly IMapper mapper;
@@ -43,7 +42,7 @@ namespace MoneyManagerService.Controllers
 
             if (user == null)
             {
-                return NotFound(new ProblemDetailsWithErrors($"User with id {id} does not exist."));
+                return NotFound($"User with id {id} does not exist.");
             }
 
             var userToReturn = mapper.Map<UserForReturnDto>(user);
@@ -67,7 +66,7 @@ namespace MoneyManagerService.Controllers
         {
             if (roleEditDto.RoleNames == null || roleEditDto.RoleNames.Length == 0)
             {
-                return BadRequest(new ProblemDetailsWithErrors("At least one role must be specified.", 400, Request));
+                return BadRequest("At least one role must be specified.");
             }
 
             var user = await userRepository.GetByIdAsync(id);
@@ -95,7 +94,7 @@ namespace MoneyManagerService.Controllers
 
             if (!success)
             {
-                return BadRequest(new ProblemDetailsWithErrors("Failed to add roles.", 400, Request));
+                return BadRequest("Failed to add roles.");
             }
 
             var userToReturn = mapper.Map<UserForReturnDto>(user);
@@ -109,7 +108,7 @@ namespace MoneyManagerService.Controllers
         {
             if (roleEditDto.RoleNames == null || roleEditDto.RoleNames.Length == 0)
             {
-                return BadRequest(new ProblemDetailsWithErrors("At least one role must be specified.", 400, Request));
+                return BadRequest("At least one role must be specified.");
             }
 
             var user = await userRepository.GetByIdAsync(id);
@@ -133,7 +132,7 @@ namespace MoneyManagerService.Controllers
 
             if (!success)
             {
-                return BadRequest(new ProblemDetailsWithErrors("Failed to remove roles.", 400, Request));
+                return BadRequest("Failed to remove roles.");
             }
 
             var userToReturn = mapper.Map<UserForReturnDto>(user);

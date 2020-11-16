@@ -2,6 +2,8 @@ using System.Linq;
 using AutoMapper;
 using MoneyManagerService.Models.Domain;
 using MoneyManagerService.Models.DTOs;
+using MoneyManagerService.Models.DTOs.Budget;
+using MoneyManagerService.Models.DTOs.Expense;
 
 namespace MoneyManagerService.Core
 {
@@ -10,6 +12,8 @@ namespace MoneyManagerService.Core
         public AutoMapperProfiles()
         {
             CreateUserMaps();
+            CreateBudgetMaps();
+            CreateExpenseMaps();
         }
 
         private void CreateUserMaps()
@@ -20,6 +24,16 @@ namespace MoneyManagerService.Core
             CreateMap<UserForRegisterDto, User>();
 
             CreateMap<Role, RoleForReturnDto>();
+        }
+
+        private void CreateBudgetMaps()
+        {
+            CreateMap<BudgetForCreateDto, Budget>();
+        }
+
+        private void CreateExpenseMaps()
+        {
+            CreateMap<ExpenseForCreateDto, Expense>();
         }
     }
 }

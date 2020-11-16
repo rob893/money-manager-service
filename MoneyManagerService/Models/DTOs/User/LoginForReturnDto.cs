@@ -1,9 +1,9 @@
 namespace MoneyManagerService.Models.DTOs
 {
-    public class LoginForReturnDto
+    public record LoginForReturnDto
     {
-        public string Token { get; set; }
-        public string RefreshToken { get; set; }
-        public UserForReturnDto User { get; set; }
+        public string Token { get; init; }
+        public string RefreshToken { get; init; }
+        public UserForReturnDto User { get; init; }
     }
 }

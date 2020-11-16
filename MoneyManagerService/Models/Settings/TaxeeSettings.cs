@@ -1,6 +1,6 @@
 namespace MoneyManagerService.Models.Settings
 {
-    public record AlphaVantageSettings
+    public record TaxeeSettings
     {
         public string BaseUrl { get; init; }
         public string ApiKey { get; init; }

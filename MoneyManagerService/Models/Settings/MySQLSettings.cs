@@ -1,9 +1,9 @@
 namespace MoneyManagerService.Models.Settings
 {
-    public class MySQLSettings
+    public record MySQLSettings
     {
-        public string DefaultConnection { get; set; }
-        public bool EnableSensitiveDataLogging { get; set; }
-        public bool EnableDetailedErrors { get; set; }
+        public string DefaultConnection { get; init; }
+        public bool EnableSensitiveDataLogging { get; init; }
+        public bool EnableDetailedErrors { get; init; }
     }
 }

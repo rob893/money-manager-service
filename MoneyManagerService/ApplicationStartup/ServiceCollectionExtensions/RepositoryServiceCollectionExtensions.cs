@@ -9,6 +9,8 @@ namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
         {
             // Interface => concrete implementation
             services.AddScoped<UserRepository>();
+            services.AddScoped<BudgetRepository>();
+            services.AddScoped<ExpenseRepository>();
 
             return services;
         }
