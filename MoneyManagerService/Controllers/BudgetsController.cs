@@ -85,7 +85,7 @@ namespace MoneyManagerService.Controllers
         public async Task<ActionResult<CursorPaginatedResponse<Expense>>> GeAsync(int id, [FromQuery] CursorPaginationParameters searchParams)
         {
             var expenses = await budgetRepository.GetExpensesForBudgetAsync(id, searchParams);
-            var paginatedResponse = CursorPaginatedResponse<Expense>.CreateFrom(expenses);
+            var paginatedResponse = CursorPaginatedResponse<Expense>.CreateFrom(expenses, searchParams.IncludeNodes, searchParams.IncludeEdges);
 
             return Ok(paginatedResponse);
         }

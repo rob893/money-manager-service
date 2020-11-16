@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MoneyManagerService.Core;
-using MoneyManagerService.Extensions;
 using MoneyManagerService.Models.Domain;
+using Newtonsoft.Json;
 
 namespace MoneyManagerService.Models.Responses
 {
@@ -11,20 +11,37 @@ namespace MoneyManagerService.Models.Responses
         where TEntity : class, IIdentifiable<TEntityKey>
         where TEntityKey : IEquatable<TEntityKey>, IComparable<TEntityKey>
     {
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public IEnumerable<Edge<TEntity>> Edges { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public IEnumerable<TEntity> Nodes { get; set; }
         public PageInfo PageInfo { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? TotalCount { get; set; }
 
         private readonly Func<TEntityKey, string> ConvertIdToBase64;
 
 
-        public CursorPaginatedResponse(IEnumerable<TEntity> items, string startCursor, string endCursor, bool hasNextPage, bool hasPreviousPage, int? totalCount, Func<TEntityKey, string> ConvertIdToBase64)
+        public CursorPaginatedResponse(IEnumerable<TEntity> items, string startCursor, string endCursor, bool hasNextPage,
+            bool hasPreviousPage, int? totalCount, Func<TEntityKey, string> ConvertIdToBase64, bool includeNodes = true, bool includeEdges = true)
         {
+            if (!includeEdges && !includeNodes)
+            {
+                throw new ArgumentException("Both includeEdges and includeNodes cannot be false.");
+            }
+
             this.ConvertIdToBase64 = ConvertIdToBase64;
 
-            SetEdges(items);
-            Nodes = items.ToList();
+            if (includeEdges)
+            {
+                SetEdges(items);
+            }
+
+            if (includeNodes)
+            {
+                Nodes = items.ToList();
+            }
+
             PageInfo = new PageInfo
             {
                 StartCursor = startCursor,
@@ -35,35 +52,23 @@ namespace MoneyManagerService.Models.Responses
             TotalCount = totalCount;
         }
 
-        public CursorPaginatedResponse(CursorPagedList<TEntity, TEntityKey> items, Func<TEntityKey, string> ConvertIdToBase64)
-        {
-            this.ConvertIdToBase64 = ConvertIdToBase64;
+        public CursorPaginatedResponse(CursorPagedList<TEntity, TEntityKey> items, Func<TEntityKey, string> ConvertIdToBase64, bool includeNodes = true, bool includeEdges = true) :
+            this(items, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount, ConvertIdToBase64, includeNodes, includeEdges)
+        { }
 
-            SetEdges(items);
-            Nodes = items.ToList();
-            PageInfo = new PageInfo
-            {
-                StartCursor = items.StartCursor,
-                EndCursor = items.EndCursor,
-                HasNextPage = items.HasNextPage,
-                HasPreviousPage = items.HasPreviousPage
-            };
-            TotalCount = items.TotalCount;
-        }
-
-        public static CursorPaginatedResponse<TDestination, int> CreateFrom<TSource, TDestination>(CursorPagedList<TSource, int> items, Func<IEnumerable<TSource>, IEnumerable<TDestination>> mappingFunction)
+        public static CursorPaginatedResponse<TDestination, int> CreateFrom<TSource, TDestination>(CursorPagedList<TSource, int> items, Func<IEnumerable<TSource>, IEnumerable<TDestination>> mappingFunction, bool includeNodes = true, bool includeEdges = true)
             where TSource : class, IIdentifiable<int>
             where TDestination : class, IIdentifiable<int>
         {
             var mappedItems = mappingFunction(items);
 
-            return new CursorPaginatedResponse<TDestination, int>(mappedItems, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount, Id => Convert.ToBase64String(BitConverter.GetBytes(Id)));
+            return new CursorPaginatedResponse<TDestination, int>(mappedItems, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount, Id => Convert.ToBase64String(BitConverter.GetBytes(Id)), includeNodes, includeEdges);
         }
 
-        public static CursorPaginatedResponse<TSource, int> CreateFrom<TSource>(CursorPagedList<TSource, int> items)
+        public static CursorPaginatedResponse<TSource, int> CreateFrom<TSource>(CursorPagedList<TSource, int> items, bool includeNodes = true, bool includeEdges = true)
             where TSource : class, IIdentifiable<int>
         {
-            return new CursorPaginatedResponse<TSource, int>(items, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount, Id => Convert.ToBase64String(BitConverter.GetBytes(Id)));
+            return new CursorPaginatedResponse<TSource, int>(items, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount, Id => Convert.ToBase64String(BitConverter.GetBytes(Id)), includeNodes, includeEdges);
         }
 
         private void SetEdges(IEnumerable<TEntity> items)
@@ -79,14 +84,17 @@ namespace MoneyManagerService.Models.Responses
     public class CursorPaginatedResponse<TEntity> : CursorPaginatedResponse<TEntity, int>
         where TEntity : class, IIdentifiable<int>
     {
-        public CursorPaginatedResponse(IEnumerable<TEntity> items, string startCursor, string endCursor, bool hasNextPage, bool hasPreviousPage, int? totalCount) : base(
+        public CursorPaginatedResponse(IEnumerable<TEntity> items, string startCursor, string endCursor,
+            bool hasNextPage, bool hasPreviousPage, int? totalCount, bool includeNodes = true, bool includeEdges = true) : base(
             items,
             startCursor,
             endCursor,
             hasNextPage,
             hasPreviousPage,
             totalCount,
-            Id => Convert.ToBase64String(BitConverter.GetBytes(Id))
+            Id => Convert.ToBase64String(BitConverter.GetBytes(Id)),
+            includeNodes,
+            includeEdges
         )
         { }
     }

@@ -87,8 +87,11 @@ namespace MoneyManagerService.Core
                     items.RemoveAt(items.Count - 1);
                 }
 
-                var startCursor = ConvertIdToBase64(items.FirstOrDefault().Id);
-                var endCursor = ConvertIdToBase64(items.LastOrDefault().Id);
+                var firstItem = items.FirstOrDefault();
+                var lastItem = items.LastOrDefault();
+
+                var startCursor = firstItem != null ? ConvertIdToBase64(firstItem.Id) : null;
+                var endCursor = lastItem != null ? ConvertIdToBase64(lastItem.Id) : null;
 
                 return new CursorPagedList<T, R>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
             }

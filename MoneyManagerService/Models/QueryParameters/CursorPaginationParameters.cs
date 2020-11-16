@@ -1,11 +1,13 @@
 namespace MoneyManagerService.Models.QueryParameters
 {
-    public class CursorPaginationParameters
+    public record CursorPaginationParameters
     {
-        public int? First { get; set; }
-        public string After { get; set; }
-        public int? Last { get; set; }
-        public string Before { get; set; }
-        public bool IncludeTotal { get; set; } = false;
+        public int? First { get; init; }
+        public string After { get; init; }
+        public int? Last { get; init; }
+        public string Before { get; init; }
+        public bool IncludeTotal { get; init; } = false;
+        public bool IncludeNodes { get; init; } = true;
+        public bool IncludeEdges { get; init; } = true;
     }
 }
