@@ -1,11 +1,27 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using MoneyManagerService.Core;
+using MoneyManagerService.Models.Domain;
 
 namespace MoneyManagerService.Controllers
 {
     public abstract class ServiceControllerBase : ControllerBase
     {
+        public bool IsUserAuthorizedForResource(IOwnedByUser<int> resource)
+        {
+            if (User.IsAdmin())
+            {
+                return true;
+            }
+
+            if (User.TryGetUserId(out int userId) && userId == resource.UserId)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         [NonAction]
         public NotFoundObjectResult NotFound(string errorMessage)
         {

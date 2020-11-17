@@ -9,6 +9,7 @@ using MoneyManagerService.Models.QueryParameters;
 using MoneyManagerService.Models.DTOs;
 using MoneyManagerService.Models.Responses;
 using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Constants;
 
 namespace MoneyManagerService.Controllers
 {
@@ -102,7 +103,7 @@ namespace MoneyManagerService.Controllers
             return Ok(userToReturn);
         }
 
-        [Authorize(Policy = "RequireAdminRole")]
+        [Authorize(Policy = AuthorizationPolicyName.RequireAdminRole)]
         [HttpDelete("{id}/roles")]
         public async Task<ActionResult<UserForReturnDto>> RemoveRolesAsync(int id, [FromBody] RoleEditDto roleEditDto)
         {

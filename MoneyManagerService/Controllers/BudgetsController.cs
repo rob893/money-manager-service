@@ -7,7 +7,9 @@ using MoneyManagerService.Models.DTOs.Budget;
 using MoneyManagerService.Models.QueryParameters;
 using MoneyManagerService.Models.Responses;
 using MoneyManagerService.Models.DTOs.Expense;
-using MoneyManagerService.Core;
+using Microsoft.AspNetCore.Authorization;
+using MoneyManagerService.Constants;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace MoneyManagerService.Controllers
 {
@@ -16,14 +18,22 @@ namespace MoneyManagerService.Controllers
     public class BudgetsController : ServiceControllerBase
     {
         private readonly BudgetRepository budgetRepository;
-        private readonly ExpenseRepository expenseRepository;
         private readonly IMapper mapper;
 
-        public BudgetsController(BudgetRepository budgetRepository, ExpenseRepository expenseRepository, IMapper mapper)
+        public BudgetsController(BudgetRepository budgetRepository, IMapper mapper)
         {
             this.budgetRepository = budgetRepository;
-            this.expenseRepository = expenseRepository;
             this.mapper = mapper;
+        }
+
+        [Authorize(Policy = AuthorizationPolicyName.RequireAdminRole)]
+        [HttpGet]
+        public async Task<ActionResult<CursorPaginatedResponse<Budget>>> GetBudgetsAsync([FromQuery] CursorPaginationParameters searchParams)
+        {
+            var budgets = await budgetRepository.SearchAsync(searchParams);
+            var paginatedResponse = CursorPaginatedResponse<Budget>.CreateFrom(budgets, searchParams.IncludeNodes, searchParams.IncludeEdges);
+
+            return Ok(paginatedResponse);
         }
 
         [HttpGet("{id}", Name = "GetBudgetAsync")]
@@ -36,7 +46,7 @@ namespace MoneyManagerService.Controllers
                 return NotFound($"No Budget with Id {id} found.");
             }
 
-            if (!User.IsAdmin() && (!User.TryGetUserId(out int userId) || result.UserId != userId))
+            if (!IsUserAuthorizedForResource(result))
             {
                 return Unauthorized("You can only access your own budget.");
             }
@@ -70,6 +80,11 @@ namespace MoneyManagerService.Controllers
                 return NotFound($"No Budget with Id {id} found.");
             }
 
+            if (!IsUserAuthorizedForResource(budget))
+            {
+                return Unauthorized("You can only access your own budget.");
+            }
+
             budgetRepository.Delete(budget);
             var saveResults = await budgetRepository.SaveAllAsync();
 
@@ -81,32 +96,80 @@ namespace MoneyManagerService.Controllers
             return NoContent();
         }
 
-        [HttpGet("{id}/expenses")]
-        public async Task<ActionResult<CursorPaginatedResponse<Expense>>> GeAsync(int id, [FromQuery] CursorPaginationParameters searchParams)
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<Budget>> UpdateBudgetAsync(int id, [FromBody] JsonPatchDocument<Budget> patchDoc)
         {
+            if (patchDoc == null)
+            {
+                return BadRequest();
+            }
+
+            var budget = await budgetRepository.GetByIdAsync(id);
+
+            if (budget == null)
+            {
+                return NotFound($"No Budget with Id {id} found.");
+            }
+
+            if (!IsUserAuthorizedForResource(budget))
+            {
+                return Unauthorized("You can only access your own budget.");
+            }
+
+            patchDoc.ApplyTo(budget);
+
+            var saveResult = await budgetRepository.SaveAllAsync();
+
+            if (!saveResult)
+            {
+                return BadRequest("Could not apply changes.");
+            }
+
+            return Ok(budget);
+        }
+
+        [HttpGet("{id}/expenses")]
+        public async Task<ActionResult<CursorPaginatedResponse<Expense>>> GetExpensesForBudgetAsync(int id, [FromQuery] CursorPaginationParameters searchParams)
+        {
+            var budget = await budgetRepository.GetByIdAsync(id);
+
+            if (budget == null)
+            {
+                return NotFound($"No Budget with Id {id} found.");
+            }
+
+            if (!IsUserAuthorizedForResource(budget))
+            {
+                return Unauthorized("You can only access your own budget.");
+            }
+
             var expenses = await budgetRepository.GetExpensesForBudgetAsync(id, searchParams);
             var paginatedResponse = CursorPaginatedResponse<Expense>.CreateFrom(expenses, searchParams.IncludeNodes, searchParams.IncludeEdges);
 
             return Ok(paginatedResponse);
         }
 
-        [HttpPost("{budgetId}/expenses")]
-        public async Task<ActionResult<Expense>> CreateExpenseForBudgetAsync(int budgetId, [FromBody] ExpenseForCreateDto expenseForCreateDto)
+        [HttpPost("{id}/expenses")]
+        public async Task<ActionResult<Expense>> CreateExpenseForBudgetAsync(int id, [FromBody] ExpenseForCreateDto expenseForCreateDto)
         {
-            var budget = await budgetRepository.GetByIdAsync(budgetId);
+            var budget = await budgetRepository.GetByIdAsync(id);
 
             if (budget == null)
             {
-                return NotFound($"No Budget with id {budgetId} found.");
+                return NotFound($"No Budget with id {id} found.");
+            }
+
+            if (!IsUserAuthorizedForResource(budget))
+            {
+                return Unauthorized("You can only access your own budget.");
             }
 
             var newExpense = mapper.Map<Expense>(expenseForCreateDto);
-            newExpense.BudgetId = budgetId;
+            newExpense.BudgetId = id;
 
             budget.Expenses.Add(newExpense);
-            // expenseRepository.Add(newExpense);
 
-            var saveResult = await expenseRepository.SaveAllAsync();
+            var saveResult = await budgetRepository.SaveAllAsync();
 
             if (!saveResult)
             {

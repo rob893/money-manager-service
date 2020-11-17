@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using MoneyManagerService.Constants;
 
 namespace MoneyManagerService.Core
 {
@@ -26,7 +27,17 @@ namespace MoneyManagerService.Core
 
         public static bool IsAdmin(this ClaimsPrincipal principal)
         {
-            return principal.IsInRole("Admin");
+            return principal.IsInRole(UserRoleName.Admin);
+        }
+
+        public static bool HasProperty(this object obj, string property)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            return obj.GetType().GetProperty(property) != null;
         }
     }
 }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace MoneyManagerService.Models.Domain
 {
-    public class Budget : IIdentifiable<int>
+    public class Budget : IIdentifiable<int>, IOwnedByUser<int>
     {
         public int Id { get; set; }
         public int UserId { get; set; }

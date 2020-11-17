@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using MoneyManagerService.Extensions;
 using MoneyManagerService.Models.Domain;
 using MoneyManagerService.Models.QueryParameters;
 
@@ -52,8 +50,11 @@ namespace MoneyManagerService.Core
             {
                 var items = await source.OrderBy(item => item.Id).ToListAsync();
 
-                var startCursor = ConvertIdToBase64(items.FirstOrDefault().Id);
-                var endCursor = ConvertIdToBase64(items.LastOrDefault().Id);
+                var firstItem = items.FirstOrDefault();
+                var lastItem = items.LastOrDefault();
+
+                var startCursor = firstItem != null ? ConvertIdToBase64(firstItem.Id) : null;
+                var endCursor = lastItem != null ? ConvertIdToBase64(lastItem.Id) : null;
 
                 return new CursorPagedList<T, R>(items, false, false, startCursor, endCursor, totalCount);
             }
@@ -127,8 +128,11 @@ namespace MoneyManagerService.Core
 
                 items.Reverse();
 
-                var startCursor = ConvertIdToBase64(items.FirstOrDefault().Id);
-                var endCursor = ConvertIdToBase64(items.LastOrDefault().Id);
+                var firstItem = items.FirstOrDefault();
+                var lastItem = items.LastOrDefault();
+
+                var startCursor = firstItem != null ? ConvertIdToBase64(firstItem.Id) : null;
+                var endCursor = lastItem != null ? ConvertIdToBase64(lastItem.Id) : null;
 
                 return new CursorPagedList<T, R>(items, hasNextPage, hasPreviousPage, startCursor, endCursor, totalCount);
             }
