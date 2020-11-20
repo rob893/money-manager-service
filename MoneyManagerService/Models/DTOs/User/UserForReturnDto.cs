@@ -7,11 +7,11 @@ namespace MoneyManagerService.Models.DTOs
     public record UserForReturnDto : IIdentifiable<int>
     {
         public int Id { get; set; }
-        public string UserName { get; init; }
-        public string FirstName { get; init; }
-        public string LastName { get; init; }
-        public string Email { get; init; }
+        public string UserName { get; init; } = default!;
+        public string FirstName { get; init; } = default!;
+        public string LastName { get; init; } = default!;
+        public string Email { get; init; } = default!;
         public DateTimeOffset Created { get; init; }
-        public IEnumerable<string> Roles { get; init; }
+        public IEnumerable<string> Roles { get; init; } = new List<string>();
     }
 }

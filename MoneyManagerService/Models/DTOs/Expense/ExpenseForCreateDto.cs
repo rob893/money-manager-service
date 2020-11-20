@@ -8,8 +8,8 @@ namespace MoneyManagerService.Models.DTOs.Expense
         [Required]
         public int? BudgetId { get; init; }
         [Required]
-        public string Name { get; init; }
-        public string Description { get; init; }
+        public string Name { get; init; } = default!;
+        public string? Description { get; init; }
         [Required]
         public double? Amount { get; init; }
         [Required]

@@ -9,6 +9,6 @@ namespace MoneyManagerService.Core
         public const string clearDataArgument = "clear";
 
         [Option("password", Required = false, HelpText = "Input password.")]
-        public string Password { get; set; }
+        public string? Password { get; set; }
     }
 }

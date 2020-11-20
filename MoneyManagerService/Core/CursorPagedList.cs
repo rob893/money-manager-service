@@ -14,12 +14,12 @@ namespace MoneyManagerService.Core
     {
         public bool HasNextPage { get; set; }
         public bool HasPreviousPage { get; set; }
-        public string StartCursor { get; set; }
-        public string EndCursor { get; set; }
+        public string? StartCursor { get; set; }
+        public string? EndCursor { get; set; }
         public int? TotalCount { get; set; }
 
 
-        public CursorPagedList(IEnumerable<TEntity> items, bool hasNextPage, bool hasPreviousPage, string startCursor, string endCursor, int? totalCount)
+        public CursorPagedList(IEnumerable<TEntity> items, bool hasNextPage, bool hasPreviousPage, string? startCursor, string? endCursor, int? totalCount)
         {
             HasNextPage = hasNextPage;
             HasPreviousPage = hasPreviousPage;
@@ -29,7 +29,7 @@ namespace MoneyManagerService.Core
             AddRange(items);
         }
 
-        public static async Task<CursorPagedList<T, R>> CreateAsync<T, R>(IQueryable<T> source, int? first, string after, int? last, string before, bool includeTotal,
+        public static async Task<CursorPagedList<T, R>> CreateAsync<T, R>(IQueryable<T> source, int? first, string? after, int? last, string? before, bool includeTotal,
         Func<R, string> ConvertIdToBase64, Func<string, R> ConvertBase64ToIdType, Func<IQueryable<T>, R, IQueryable<T>> AddAfterExp, Func<IQueryable<T>, R, IQueryable<T>> AddBeforeExp)
             where T : class, IIdentifiable<R>
             where R : IEquatable<R>, IComparable<R>
@@ -140,7 +140,7 @@ namespace MoneyManagerService.Core
             throw new Exception("Error creating cursor paged list.");
         }
 
-        public static Task<CursorPagedList<T, int>> CreateAsync<T>(IQueryable<T> source, int? first, string after, int? last, string before, bool includeTotal = false)
+        public static Task<CursorPagedList<T, int>> CreateAsync<T>(IQueryable<T> source, int? first, string? after, int? last, string? before, bool includeTotal = false)
             where T : class, IIdentifiable<int>
         {
             return CreateAsync(source, first, after, last, before, includeTotal,
@@ -179,7 +179,7 @@ namespace MoneyManagerService.Core
     public class CursorPagedList<TEntity> : CursorPagedList<TEntity, int>
         where TEntity : class, IIdentifiable<int>
     {
-        public CursorPagedList(IEnumerable<TEntity> items, bool hasNextPage, bool hasPreviousPage, string startCursor, string endCursor, int? totalCount) : base(
+        public CursorPagedList(IEnumerable<TEntity> items, bool hasNextPage, bool hasPreviousPage, string? startCursor, string? endCursor, int? totalCount) : base(
             items,
             hasNextPage,
             hasPreviousPage,

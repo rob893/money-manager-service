@@ -8,7 +8,7 @@ namespace MoneyManagerService.Core
 {
     public class ProblemDetailsWithErrors : ProblemDetails
     {
-        public IEnumerable<string> Errors { get; set; }
+        public IEnumerable<string> Errors { get; set; } = new List<string>();
 
         private readonly Dictionary<int, string> errorTypes = new Dictionary<int, string>
         {
@@ -31,7 +31,7 @@ namespace MoneyManagerService.Core
         };
 
 
-        public ProblemDetailsWithErrors(IList<string> errors, int statusCode, HttpRequest request = null)
+        public ProblemDetailsWithErrors(IList<string> errors, int statusCode, HttpRequest? request = null)
         {
             SetProblemDetails(errors, statusCode, request);
         }
@@ -40,13 +40,13 @@ namespace MoneyManagerService.Core
             this(new List<string> { error }, statusCode, request)
         { }
 
-        public ProblemDetailsWithErrors(Exception error, int statusCode, HttpRequest request = null)
+        public ProblemDetailsWithErrors(Exception error, int statusCode, HttpRequest? request = null)
         {
             var errors = new List<string> { error.Message };
 
             if (error is AggregateException)
             {
-                AggregateException aggEx = error as AggregateException;
+                AggregateException aggEx = error as AggregateException ?? throw new ArgumentException(null, nameof(error));
                 foreach (var innerException in aggEx.InnerExceptions)
                 {
                     errors.Add(innerException.Message);
@@ -71,7 +71,7 @@ namespace MoneyManagerService.Core
 
         public ProblemDetailsWithErrors(Exception error, HttpRequest request = null) : this(error, 500, request) { }
 
-        private void SetProblemDetails(IList<string> errors, int statusCode, HttpRequest request)
+        private void SetProblemDetails(IList<string> errors, int statusCode, HttpRequest? request)
         {
             Errors = errors;
             Detail = errors.Count > 0 ? errors[0] : "Unknown error.";

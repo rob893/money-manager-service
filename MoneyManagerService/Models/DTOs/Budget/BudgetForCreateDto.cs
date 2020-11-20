@@ -5,9 +5,9 @@ namespace MoneyManagerService.Models.DTOs.Budget
     public record BudgetForCreateDto
     {
         [Required]
-        public string Name { get; init; }
+        public string Name { get; init; } = default!;
         [Required]
         public int? UserId { get; init; }
-        public string Description { get; init; }
+        public string? Description { get; init; }
     }
 }

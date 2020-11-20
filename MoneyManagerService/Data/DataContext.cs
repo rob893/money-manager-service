@@ -9,10 +9,10 @@ namespace MoneyManagerService.Data
         IdentityUserClaim<int>, UserRole, IdentityUserLogin<int>,
         IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<TickerTimeSeries> TickerTimeSeries { get; set; }
-        public DbSet<Budget> Budgets { get; set; }
-        public DbSet<Expense> Expenses { get; set; }
+        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<TickerTimeSeries> TickerTimeSeries => Set<TickerTimeSeries>();
+        public DbSet<Budget> Budgets => Set<Budget>();
+        public DbSet<Expense> Expenses => Set<Expense>();
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 

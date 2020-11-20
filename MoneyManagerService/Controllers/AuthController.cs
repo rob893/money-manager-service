@@ -60,7 +60,7 @@ namespace MoneyManagerService.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<LoginForReturnDto>> LoginAsync([FromBody] UserForLoginDto userForLoginDto)
         {
-            var user = await userRepository.GetByUsernameAsync(userForLoginDto.Username, user => user.RefreshToken);
+            var user = await userRepository.GetByUsernameAsync(userForLoginDto.Username, user => user.RefreshToken!);
 
             if (user == null)
             {
@@ -131,7 +131,7 @@ namespace MoneyManagerService.Controllers
                 return Unauthorized("Invalid token.");
             }
 
-            var user = await userRepository.GetByIdAsync(userId, user => user.RefreshToken);
+            var user = await userRepository.GetByIdAsync(userId, user => user.RefreshToken!);
 
             if (user == null)
             {

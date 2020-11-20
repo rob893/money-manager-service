@@ -12,7 +12,7 @@ namespace MoneyManagerService.Extensions
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            string value = configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT")?.Trim();
+            var value = configuration.GetValue<string>("ASPNETCORE_ENVIRONMENT")?.Trim();
             return string.IsNullOrWhiteSpace(value) ? throw new Exception($"'ASPNETCORE_ENVIRONMENT' is not defined in configuration.") : value;
         }
     }

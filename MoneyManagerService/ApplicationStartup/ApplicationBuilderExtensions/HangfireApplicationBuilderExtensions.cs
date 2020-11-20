@@ -55,7 +55,7 @@ namespace MoneyManagerService.ApplicationStartup.ApplicationBuilderExtensions
                     var encodedUsernamePassword = authHeader.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries)[1]?.Trim();
 
                     // Decode from Base64 to string
-                    var decodedUsernamePassword = Encoding.UTF8.GetString(Convert.FromBase64String(encodedUsernamePassword));
+                    var decodedUsernamePassword = Encoding.UTF8.GetString(Convert.FromBase64String(encodedUsernamePassword ?? ""));
 
                     // Split username and password
                     var username = decodedUsernamePassword.Split(':', 2)[0];

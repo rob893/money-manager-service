@@ -12,9 +12,9 @@ namespace MoneyManagerService.Models.Responses
         where TEntityKey : IEquatable<TEntityKey>, IComparable<TEntityKey>
     {
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public IEnumerable<Edge<TEntity>> Edges { get; set; }
+        public IEnumerable<Edge<TEntity>>? Edges { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public IEnumerable<TEntity> Nodes { get; set; }
+        public IEnumerable<TEntity>? Nodes { get; set; }
         public PageInfo PageInfo { get; set; }
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public int? TotalCount { get; set; }
@@ -22,7 +22,7 @@ namespace MoneyManagerService.Models.Responses
         private readonly Func<TEntityKey, string> ConvertIdToBase64;
 
 
-        public CursorPaginatedResponse(IEnumerable<TEntity> items, string startCursor, string endCursor, bool hasNextPage,
+        public CursorPaginatedResponse(IEnumerable<TEntity> items, string? startCursor, string? endCursor, bool hasNextPage,
             bool hasPreviousPage, int? totalCount, Func<TEntityKey, string> ConvertIdToBase64, bool includeNodes = true, bool includeEdges = true)
         {
             if (!includeEdges && !includeNodes)
@@ -84,7 +84,7 @@ namespace MoneyManagerService.Models.Responses
     public class CursorPaginatedResponse<TEntity> : CursorPaginatedResponse<TEntity, int>
         where TEntity : class, IIdentifiable<int>
     {
-        public CursorPaginatedResponse(IEnumerable<TEntity> items, string startCursor, string endCursor,
+        public CursorPaginatedResponse(IEnumerable<TEntity> items, string? startCursor, string? endCursor,
             bool hasNextPage, bool hasPreviousPage, int? totalCount, bool includeNodes = true, bool includeEdges = true) : base(
             items,
             startCursor,
@@ -101,14 +101,14 @@ namespace MoneyManagerService.Models.Responses
 
     public class Edge<T>
     {
-        public string Cursor { get; set; }
-        public T Node { get; set; }
+        public string Cursor { get; set; } = default!;
+        public T Node { get; set; } = default!;
     }
 
     public class PageInfo
     {
-        public string StartCursor { get; set; }
-        public string EndCursor { get; set; }
+        public string? StartCursor { get; set; }
+        public string? EndCursor { get; set; }
         public bool HasNextPage { get; set; }
         public bool HasPreviousPage { get; set; }
     }

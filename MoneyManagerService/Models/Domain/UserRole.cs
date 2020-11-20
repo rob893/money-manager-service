@@ -4,7 +4,7 @@ namespace MoneyManagerService.Models.Domain
 {
     public class UserRole : IdentityUserRole<int>
     {
-        public User User { get; set; }
-        public Role Role { get; set; }
+        public User User { get; set; } = default!;
+        public Role Role { get; set; } = default!;
     }
 }

@@ -1,11 +1,49 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
+using MoneyManagerService.Constants;
 
 namespace MoneyManagerService.Extensions
 {
     public static class UtilityExtensions
     {
+        public static bool TryGetUserId(this ClaimsPrincipal principal, [NotNullWhen(true)] out int? userId)
+        {
+            userId = null;
+
+            var nameIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (nameIdClaim == null)
+            {
+                return false;
+            }
+
+            if (int.TryParse(nameIdClaim.Value, out int value))
+            {
+                userId = value;
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsAdmin(this ClaimsPrincipal principal)
+        {
+            return principal.IsInRole(UserRoleName.Admin);
+        }
+
+        public static bool HasProperty(this object obj, string property)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+
+            return obj.GetType().GetProperty(property) != null;
+        }
+
         public static int ConvertToInt32FromBase64(this string str)
         {
             try
@@ -32,13 +70,13 @@ namespace MoneyManagerService.Extensions
         {
             if (source == null)
             {
-                ThrowExceptionWhenSourceArgumentIsNull();
+                throw new ArgumentNullException(nameof(source), "Unable to convert object to a dictionary. The source object is null.");
             }
 
             var dictionary = new Dictionary<string, T>();
             foreach (PropertyDescriptor property in TypeDescriptor.GetProperties(source))
             {
-                AddPropertyToDictionary<T>(property, source, dictionary);
+                AddPropertyToDictionary(property, source, dictionary);
             }
 
             return dictionary;
@@ -56,11 +94,6 @@ namespace MoneyManagerService.Extensions
         private static bool IsOfType<T>(object value)
         {
             return value is T;
-        }
-
-        private static void ThrowExceptionWhenSourceArgumentIsNull()
-        {
-            throw new ArgumentNullException("source", "Unable to convert object to a dictionary. The source object is null.");
         }
     }
 }

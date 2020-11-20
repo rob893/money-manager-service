@@ -5,7 +5,7 @@ namespace MoneyManagerService.Models.Domain
     public class TickerTimeSeries : IIdentifiable<int>
     {
         public int Id { get; set; }
-        public string Ticker { get; set; }
+        public string Ticker { get; set; } = default!;
         public DateTime Date { get; set; }
         public double Open { get; set; }
         public double High { get; set; }

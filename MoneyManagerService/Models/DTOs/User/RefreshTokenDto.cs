@@ -5,8 +5,8 @@ namespace MoneyManagerService.Models.DTOs
     public record RefreshTokenDto
     {
         [Required]
-        public string Token { get; init; }
+        public string Token { get; init; } = default!;
         [Required]
-        public string RefreshToken { get; init; }
+        public string RefreshToken { get; init; } = default!;
     }
 }

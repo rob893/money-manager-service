@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using MoneyManagerService.Core;
+using MoneyManagerService.Extensions;
 using MoneyManagerService.Models.Domain;
 
 namespace MoneyManagerService.Controllers
@@ -14,7 +15,7 @@ namespace MoneyManagerService.Controllers
                 return true;
             }
 
-            if (User.TryGetUserId(out int userId) && userId == resource.UserId)
+            if (User.TryGetUserId(out int? userId) && userId == resource.UserId)
             {
                 return true;
             }

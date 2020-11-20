@@ -5,17 +5,17 @@ namespace MoneyManagerService.Models.Settings
         /// <summary>
         /// The API secret of this API
         /// </summary>
-        public string APISecrect { get; init; }
+        public string APISecrect { get; init; } = default!;
 
         /// <summary>
         /// The value of the audience claim for tokens created by this API
         /// </summary>
-        public string TokenAudience { get; init; }
+        public string TokenAudience { get; init; } = default!;
 
         /// <summary>
         /// The value of the issuer claim for tokens created by this API
         /// </summary>
-        public string TokenIssuer { get; init; }
+        public string TokenIssuer { get; init; } = default!;
 
         /// <summary>
         /// This is the amount of time a token issued by this API FOR THIS API (not tokens issued from the API for other APIs using the TokensController) is good for.
