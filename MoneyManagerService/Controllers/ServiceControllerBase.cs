@@ -8,9 +8,10 @@ namespace MoneyManagerService.Controllers
 {
     public abstract class ServiceControllerBase : ControllerBase
     {
-        public bool IsUserAuthorizedForResource(IOwnedByUser<int> resource)
+        [NonAction]
+        public bool IsUserAuthorizedForResource(IOwnedByUser<int> resource, bool isAdminAuthorized = true)
         {
-            if (User.IsAdmin())
+            if (isAdminAuthorized && User.IsAdmin())
             {
                 return true;
             }

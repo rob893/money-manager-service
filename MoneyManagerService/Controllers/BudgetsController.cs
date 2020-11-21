@@ -10,6 +10,7 @@ using MoneyManagerService.Models.DTOs.Expense;
 using Microsoft.AspNetCore.Authorization;
 using MoneyManagerService.Constants;
 using Microsoft.AspNetCore.JsonPatch;
+using MoneyManagerService.Extensions;
 
 namespace MoneyManagerService.Controllers
 {
@@ -97,11 +98,11 @@ namespace MoneyManagerService.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<ActionResult<Budget>> UpdateBudgetAsync(int id, [FromBody] JsonPatchDocument<Budget> patchDoc)
+        public async Task<ActionResult<Budget>> UpdateBudgetAsync(int id, [FromBody] JsonPatchDocument<BudgetForUpdateDto> dtoPatchDoc)
         {
-            if (patchDoc == null)
+            if (dtoPatchDoc == null || dtoPatchDoc.Operations.Count == 0)
             {
-                return BadRequest();
+                return BadRequest("A JSON patch document with at least 1 operation is required.");
             }
 
             var budget = await budgetRepository.GetByIdAsync(id);
@@ -115,6 +116,13 @@ namespace MoneyManagerService.Controllers
             {
                 return Unauthorized("You can only access your own budget.");
             }
+
+            if (!dtoPatchDoc.IsValid(out var errors))
+            {
+                return BadRequest(errors);
+            }
+
+            var patchDoc = mapper.Map<JsonPatchDocument<Budget>>(dtoPatchDoc);
 
             patchDoc.ApplyTo(budget);
 

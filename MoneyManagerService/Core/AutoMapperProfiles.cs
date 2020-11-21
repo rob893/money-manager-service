@@ -1,5 +1,7 @@
 using System.Linq;
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.Operations;
 using MoneyManagerService.Models.Domain;
 using MoneyManagerService.Models.DTOs;
 using MoneyManagerService.Models.DTOs.Budget;
@@ -29,6 +31,8 @@ namespace MoneyManagerService.Core
         private void CreateBudgetMaps()
         {
             CreateMap<BudgetForCreateDto, Budget>();
+            CreateMap<JsonPatchDocument<BudgetForUpdateDto>, JsonPatchDocument<Budget>>();
+            CreateMap<Operation<BudgetForUpdateDto>, Operation<Budget>>();
         }
 
         private void CreateExpenseMaps()
