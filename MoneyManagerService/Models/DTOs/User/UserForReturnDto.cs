@@ -6,7 +6,7 @@ namespace MoneyManagerService.Models.DTOs
 {
     public record UserForReturnDto : IIdentifiable<int>
     {
-        public int Id { get; set; }
+        public int Id { get; init; }
         public string UserName { get; init; } = default!;
         public string FirstName { get; init; } = default!;
         public string LastName { get; init; } = default!;

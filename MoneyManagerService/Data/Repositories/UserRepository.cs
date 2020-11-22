@@ -56,12 +56,12 @@ namespace MoneyManagerService.Data.Repositories
             return result.Succeeded;
         }
 
-        // public Task<CursorPagedList<Role, int>> GetRolesAsync(CursorPaginationParameters searchParams)
-        // {
-        //     IQueryable<Role> query = context.Roles;
+        public Task<CursorPagedList<Role, int>> GetRolesAsync(CursorPaginationParameters searchParams)
+        {
+            IQueryable<Role> query = context.Roles;
 
-        //     return CursorPagedList<Role, int>.CreateAsync<Role, int>(query, searchParams, ConvertIdToBase64, ConvertBase64ToIdType, AddAfterExp, AddBeforeExp);
-        // }
+            return CursorPagedList<Role, int>.CreateAsync(query, searchParams);
+        }
 
         public Task<List<Role>> GetRolesAsync()
         {

@@ -10,6 +10,8 @@ using MoneyManagerService.Models.DTOs;
 using MoneyManagerService.Models.Responses;
 using MoneyManagerService.Models.Domain;
 using MoneyManagerService.Constants;
+using Microsoft.AspNetCore.JsonPatch;
+using MoneyManagerService.Extensions;
 
 namespace MoneyManagerService.Controllers
 {
@@ -51,17 +53,57 @@ namespace MoneyManagerService.Controllers
             return Ok(userToReturn);
         }
 
-        // [Authorize(Policy = "RequireAdminRole")]
-        // [HttpGet("roles")]
-        // public async Task<ActionResult<CursorPaginatedResponse<RoleForReturnDto, int>>> GetRolesAsync([FromQuery] CursorPaginationParameters searchParams)
-        // {
-        //     var roles = await userRepository.GetRolesAsync(searchParams);
-        //     var paginatedResponse = CursorPaginatedResponse<RoleForReturnDto, int>.CreateFrom(roles, mapper.Map<IEnumerable<RoleForReturnDto>>);
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<UserForReturnDto>> UpdateUserAsync(int id, [FromBody] JsonPatchDocument<UserForUpdateDto> dtoPatchDoc)
+        {
+            if (dtoPatchDoc == null || dtoPatchDoc.Operations.Count == 0)
+            {
+                return BadRequest("A JSON patch document with at least 1 operation is required.");
+            }
 
-        //     return Ok(paginatedResponse);
-        // }
+            var user = await userRepository.GetByIdAsync(id);
 
-        [Authorize(Policy = "RequireAdminRole")]
+            if (user == null)
+            {
+                return NotFound($"No user with Id {id} found.");
+            }
+
+            if (!User.TryGetUserId(out var userId))
+            {
+                return Unauthorized("You cannot do this.");
+            }
+
+            if (!User.IsAdmin() && userId != user.Id)
+            {
+                return Unauthorized("You cannot do this.");
+            }
+
+            if (!dtoPatchDoc.IsValid(out var errors))
+            {
+                return BadRequest(errors);
+            }
+
+            var patchDoc = mapper.Map<JsonPatchDocument<User>>(dtoPatchDoc);
+
+            patchDoc.ApplyTo(user);
+
+            await userRepository.SaveAllAsync();
+
+            var userToReturn = mapper.Map<UserForReturnDto>(user);
+
+            return Ok(userToReturn);
+        }
+
+        [HttpGet("roles")]
+        public async Task<ActionResult<CursorPaginatedResponse<RoleForReturnDto>>> GetRolesAsync([FromQuery] CursorPaginationParameters searchParams)
+        {
+            var roles = await userRepository.GetRolesAsync(searchParams);
+            var paginatedResponse = CursorPaginatedResponse<RoleForReturnDto>.CreateFrom(roles, mapper.Map<IEnumerable<RoleForReturnDto>>, searchParams.IncludeNodes, searchParams.IncludeEdges);
+
+            return Ok(paginatedResponse);
+        }
+
+        [Authorize(Policy = AuthorizationPolicyName.RequireAdminRole)]
         [HttpPost("{id}/roles")]
         public async Task<ActionResult<UserForReturnDto>> AddRolesAsync(int id, [FromBody] RoleEditDto roleEditDto)
         {

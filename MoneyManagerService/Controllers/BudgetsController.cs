@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using MoneyManagerService.Constants;
 using Microsoft.AspNetCore.JsonPatch;
 using MoneyManagerService.Extensions;
+using System.Collections.Generic;
 
 namespace MoneyManagerService.Controllers
 {
@@ -29,16 +30,16 @@ namespace MoneyManagerService.Controllers
 
         [Authorize(Policy = AuthorizationPolicyName.RequireAdminRole)]
         [HttpGet]
-        public async Task<ActionResult<CursorPaginatedResponse<Budget>>> GetBudgetsAsync([FromQuery] CursorPaginationParameters searchParams)
+        public async Task<ActionResult<CursorPaginatedResponse<BudgetForReturnDto>>> GetBudgetsAsync([FromQuery] CursorPaginationParameters searchParams)
         {
             var budgets = await budgetRepository.SearchAsync(searchParams);
-            var paginatedResponse = CursorPaginatedResponse<Budget>.CreateFrom(budgets, searchParams.IncludeNodes, searchParams.IncludeEdges);
+            var paginatedResponse = CursorPaginatedResponse<BudgetForReturnDto>.CreateFrom(budgets, mapper.Map<IEnumerable<BudgetForReturnDto>>, searchParams.IncludeNodes, searchParams.IncludeEdges);
 
             return Ok(paginatedResponse);
         }
 
         [HttpGet("{id}", Name = "GetBudgetAsync")]
-        public async Task<ActionResult<Budget>> GetBudgetAsync(int id)
+        public async Task<ActionResult<BudgetForReturnDto>> GetBudgetAsync(int id)
         {
             var result = await budgetRepository.GetByIdAsync(id);
 
@@ -52,13 +53,21 @@ namespace MoneyManagerService.Controllers
                 return Unauthorized("You can only access your own budget.");
             }
 
-            return Ok(result);
+            var budgetForReturn = mapper.Map<BudgetForReturnDto>(result);
+
+            return Ok(budgetForReturn);
         }
 
         [HttpPost]
-        public async Task<ActionResult<Budget>> CreateBudgetAsync([FromBody] BudgetForCreateDto budgetForCreateDto)
+        public async Task<ActionResult<BudgetForReturnDto>> CreateBudgetAsync([FromBody] BudgetForCreateDto budgetForCreateDto)
         {
             var newBudget = mapper.Map<Budget>(budgetForCreateDto);
+
+            if (!IsUserAuthorizedForResource(newBudget))
+            {
+                return Unauthorized("You can only create budgets for yourself.");
+            }
+
             budgetRepository.Add(newBudget);
 
             var saveResult = await budgetRepository.SaveAllAsync();
@@ -68,7 +77,9 @@ namespace MoneyManagerService.Controllers
                 return BadRequest("Unable to create budget.");
             }
 
-            return CreatedAtRoute("GetBudgetAsync", new { id = newBudget.Id }, newBudget);
+            var budgetForReturn = mapper.Map<BudgetForReturnDto>(newBudget);
+
+            return CreatedAtRoute("GetBudgetAsync", new { id = budgetForReturn.Id }, budgetForReturn);
         }
 
         [HttpDelete("{id}")]
@@ -98,7 +109,7 @@ namespace MoneyManagerService.Controllers
         }
 
         [HttpPatch("{id}")]
-        public async Task<ActionResult<Budget>> UpdateBudgetAsync(int id, [FromBody] JsonPatchDocument<BudgetForUpdateDto> dtoPatchDoc)
+        public async Task<ActionResult<BudgetForReturnDto>> UpdateBudgetAsync(int id, [FromBody] JsonPatchDocument<BudgetForUpdateDto> dtoPatchDoc)
         {
             if (dtoPatchDoc == null || dtoPatchDoc.Operations.Count == 0)
             {
@@ -126,18 +137,15 @@ namespace MoneyManagerService.Controllers
 
             patchDoc.ApplyTo(budget);
 
-            var saveResult = await budgetRepository.SaveAllAsync();
+            await budgetRepository.SaveAllAsync();
 
-            if (!saveResult)
-            {
-                return BadRequest("Could not apply changes.");
-            }
+            var budgetForReturn = mapper.Map<BudgetForReturnDto>(budget);
 
-            return Ok(budget);
+            return Ok(budgetForReturn);
         }
 
         [HttpGet("{id}/expenses")]
-        public async Task<ActionResult<CursorPaginatedResponse<Expense>>> GetExpensesForBudgetAsync(int id, [FromQuery] CursorPaginationParameters searchParams)
+        public async Task<ActionResult<CursorPaginatedResponse<ExpenseForReturnDto>>> GetExpensesForBudgetAsync(int id, [FromQuery] CursorPaginationParameters searchParams)
         {
             var budget = await budgetRepository.GetByIdAsync(id);
 
@@ -152,13 +160,13 @@ namespace MoneyManagerService.Controllers
             }
 
             var expenses = await budgetRepository.GetExpensesForBudgetAsync(id, searchParams);
-            var paginatedResponse = CursorPaginatedResponse<Expense>.CreateFrom(expenses, searchParams.IncludeNodes, searchParams.IncludeEdges);
+            var paginatedResponse = CursorPaginatedResponse<ExpenseForReturnDto>.CreateFrom(expenses, mapper.Map<IEnumerable<ExpenseForReturnDto>>, searchParams.IncludeNodes, searchParams.IncludeEdges);
 
             return Ok(paginatedResponse);
         }
 
         [HttpPost("{id}/expenses")]
-        public async Task<ActionResult<Expense>> CreateExpenseForBudgetAsync(int id, [FromBody] ExpenseForCreateDto expenseForCreateDto)
+        public async Task<ActionResult<ExpenseForReturnDto>> CreateExpenseForBudgetAsync(int id, [FromBody] ExpenseForCreateDto expenseForCreateDto)
         {
             var budget = await budgetRepository.GetByIdAsync(id);
 
@@ -184,7 +192,9 @@ namespace MoneyManagerService.Controllers
                 return BadRequest("Unable to create expense.");
             }
 
-            return CreatedAtRoute("GetExpenseAsync", new { id = newExpense.Id }, newExpense);
+            var expenseToReturn = mapper.Map<ExpenseForReturnDto>(newExpense);
+
+            return CreatedAtRoute("GetExpenseAsync", new { id = expenseToReturn.Id }, expenseToReturn);
         }
     }
 }

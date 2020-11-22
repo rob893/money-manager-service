@@ -24,12 +24,14 @@ namespace MoneyManagerService.Core
                 .ForMember(dto => dto.Roles, opt =>
                     opt.MapFrom(u => u.UserRoles.Select(ur => ur.Role.Name)));
             CreateMap<UserForRegisterDto, User>();
-
             CreateMap<Role, RoleForReturnDto>();
+            CreateMap<JsonPatchDocument<UserForUpdateDto>, JsonPatchDocument<User>>();
+            CreateMap<Operation<UserForUpdateDto>, Operation<User>>();
         }
 
         private void CreateBudgetMaps()
         {
+            CreateMap<Budget, BudgetForReturnDto>();
             CreateMap<BudgetForCreateDto, Budget>();
             CreateMap<JsonPatchDocument<BudgetForUpdateDto>, JsonPatchDocument<Budget>>();
             CreateMap<Operation<BudgetForUpdateDto>, Operation<Budget>>();
@@ -37,7 +39,10 @@ namespace MoneyManagerService.Core
 
         private void CreateExpenseMaps()
         {
+            CreateMap<Expense, ExpenseForReturnDto>();
             CreateMap<ExpenseForCreateDto, Expense>();
+            CreateMap<JsonPatchDocument<ExpenseForUpdateDto>, JsonPatchDocument<Expense>>();
+            CreateMap<Operation<ExpenseForUpdateDto>, Operation<Expense>>();
         }
     }
 }
