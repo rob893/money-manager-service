@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using MoneyManagerService.Models.Domain;
 
 namespace MoneyManagerService.Models.DTOs.Budget
 {
@@ -9,5 +10,6 @@ namespace MoneyManagerService.Models.DTOs.Budget
         [Required]
         public int? UserId { get; init; }
         public string? Description { get; init; }
+        public TaxFilingStatus? TaxFilingStatus { get; set; }
     }
 }

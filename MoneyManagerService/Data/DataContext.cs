@@ -13,6 +13,8 @@ namespace MoneyManagerService.Data
         public DbSet<TickerTimeSeries> TickerTimeSeries => Set<TickerTimeSeries>();
         public DbSet<Budget> Budgets => Set<Budget>();
         public DbSet<Expense> Expenses => Set<Expense>();
+        public DbSet<Income> Incomes => Set<Income>();
+        public DbSet<TaxLiability> TaxLiabilities => Set<TaxLiability>();
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
@@ -48,6 +50,14 @@ namespace MoneyManagerService.Data
             modelBuilder.Entity<Expense>()
                 .Property(expense => expense.Frequency)
                 .HasConversion<string>();
+
+            modelBuilder.Entity<Budget>()
+                .Property(budget => budget.TaxFilingStatus)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Income>()
+               .Property(income => income.IncomeType)
+               .HasConversion<string>();
         }
     }
 }

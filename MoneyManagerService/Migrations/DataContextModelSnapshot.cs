@@ -111,6 +111,11 @@ namespace MoneyManagerService.Migrations
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("TaxFilingStatus")
+                        .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<int>("UserId")
@@ -143,6 +148,7 @@ namespace MoneyManagerService.Migrations
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
                     b.HasKey("Id");
@@ -150,6 +156,36 @@ namespace MoneyManagerService.Migrations
                     b.HasIndex("BudgetId");
 
                     b.ToTable("Expenses");
+                });
+
+            modelBuilder.Entity("MoneyManagerService.Models.Domain.Income", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("double");
+
+                    b.Property<int>("BudgetId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("IncomeType")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BudgetId");
+
+                    b.ToTable("Incomes");
                 });
 
             modelBuilder.Entity("MoneyManagerService.Models.Domain.RefreshToken", b =>
@@ -197,6 +233,32 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
+            modelBuilder.Entity("MoneyManagerService.Models.Domain.TaxLiability", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("BudgetId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Federal")
+                        .HasColumnType("double");
+
+                    b.Property<double>("Fica")
+                        .HasColumnType("double");
+
+                    b.Property<double>("State")
+                        .HasColumnType("double");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BudgetId")
+                        .IsUnique();
+
+                    b.ToTable("TaxLiabilities");
+                });
+
             modelBuilder.Entity("MoneyManagerService.Models.Domain.TickerTimeSeries", b =>
                 {
                     b.Property<int>("Id")
@@ -225,6 +287,7 @@ namespace MoneyManagerService.Migrations
                         .HasColumnType("double");
 
                     b.Property<string>("Ticker")
+                        .IsRequired()
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
                     b.Property<double>("Volume")
@@ -380,7 +443,18 @@ namespace MoneyManagerService.Migrations
             modelBuilder.Entity("MoneyManagerService.Models.Domain.Expense", b =>
                 {
                     b.HasOne("MoneyManagerService.Models.Domain.Budget", "Budget")
-                        .WithMany()
+                        .WithMany("Expenses")
+                        .HasForeignKey("BudgetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Budget");
+                });
+
+            modelBuilder.Entity("MoneyManagerService.Models.Domain.Income", b =>
+                {
+                    b.HasOne("MoneyManagerService.Models.Domain.Budget", "Budget")
+                        .WithMany("Incomes")
                         .HasForeignKey("BudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -397,6 +471,17 @@ namespace MoneyManagerService.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MoneyManagerService.Models.Domain.TaxLiability", b =>
+                {
+                    b.HasOne("MoneyManagerService.Models.Domain.Budget", "Budget")
+                        .WithOne("TaxLiability")
+                        .HasForeignKey("MoneyManagerService.Models.Domain.TaxLiability", "BudgetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Budget");
                 });
 
             modelBuilder.Entity("MoneyManagerService.Models.Domain.UserRole", b =>
@@ -416,6 +501,15 @@ namespace MoneyManagerService.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MoneyManagerService.Models.Domain.Budget", b =>
+                {
+                    b.Navigation("Expenses");
+
+                    b.Navigation("Incomes");
+
+                    b.Navigation("TaxLiability");
                 });
 
             modelBuilder.Entity("MoneyManagerService.Models.Domain.Role", b =>

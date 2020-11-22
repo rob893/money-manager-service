@@ -58,7 +58,7 @@ namespace MoneyManagerService.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Ticker = table.Column<string>(type: "varchar(255) CHARACTER SET utf8mb4", nullable: true),
+                    Ticker = table.Column<string>(type: "varchar(255) CHARACTER SET utf8mb4", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Open = table.Column<double>(type: "double", nullable: false),
                     High = table.Column<double>(type: "double", nullable: false),
@@ -186,8 +186,9 @@ namespace MoneyManagerService.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UserId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true),
-                    Description = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true)
+                    Name = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: false),
+                    Description = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true),
+                    TaxFilingStatus = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -226,7 +227,7 @@ namespace MoneyManagerService.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     BudgetId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true),
+                    Name = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: false),
                     Description = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true),
                     Amount = table.Column<double>(type: "double", nullable: false),
                     Frequency = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: false)
@@ -236,6 +237,51 @@ namespace MoneyManagerService.Migrations
                     table.PrimaryKey("PK_Expenses", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Expenses_Budgets_BudgetId",
+                        column: x => x.BudgetId,
+                        principalTable: "Budgets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Incomes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    BudgetId = table.Column<int>(type: "int", nullable: false),
+                    IncomeType = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: false),
+                    Name = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: false),
+                    Description = table.Column<string>(type: "longtext CHARACTER SET utf8mb4", nullable: true),
+                    Amount = table.Column<double>(type: "double", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Incomes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Incomes_Budgets_BudgetId",
+                        column: x => x.BudgetId,
+                        principalTable: "Budgets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TaxLiabilities",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    BudgetId = table.Column<int>(type: "int", nullable: false),
+                    Federal = table.Column<double>(type: "double", nullable: false),
+                    Fica = table.Column<double>(type: "double", nullable: false),
+                    State = table.Column<double>(type: "double", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TaxLiabilities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TaxLiabilities_Budgets_BudgetId",
                         column: x => x.BudgetId,
                         principalTable: "Budgets",
                         principalColumn: "Id",
@@ -290,6 +336,17 @@ namespace MoneyManagerService.Migrations
                 column: "BudgetId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Incomes_BudgetId",
+                table: "Incomes",
+                column: "BudgetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TaxLiabilities_BudgetId",
+                table: "TaxLiabilities",
+                column: "BudgetId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TickerTimeSeries_Ticker_Date",
                 table: "TickerTimeSeries",
                 columns: new[] { "Ticker", "Date" });
@@ -316,7 +373,13 @@ namespace MoneyManagerService.Migrations
                 name: "Expenses");
 
             migrationBuilder.DropTable(
+                name: "Incomes");
+
+            migrationBuilder.DropTable(
                 name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
+                name: "TaxLiabilities");
 
             migrationBuilder.DropTable(
                 name: "TickerTimeSeries");
