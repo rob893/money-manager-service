@@ -1,4 +1,4 @@
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

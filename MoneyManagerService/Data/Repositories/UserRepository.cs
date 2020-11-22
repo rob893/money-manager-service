@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MoneyManagerService.Core;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using MoneyManagerService.Models.QueryParameters;
 
 namespace MoneyManagerService.Data.Repositories

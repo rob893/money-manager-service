@@ -103,7 +103,7 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.Budget", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.Budget", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -130,7 +130,7 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("Budgets");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.Expense", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.Expense", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -160,7 +160,7 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("Expenses");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.Income", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.Income", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -190,7 +190,7 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("Incomes");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.RefreshToken", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -208,7 +208,7 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.Role", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -235,7 +235,7 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.TaxLiability", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.TaxLiability", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -261,7 +261,7 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("TaxLiabilities");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.TickerTimeSeries", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.TickerTimeSeries", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -302,7 +302,7 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("TickerTimeSeries");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.User", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -380,7 +380,7 @@ namespace MoneyManagerService.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.UserRole", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.UserRole", b =>
                 {
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -397,7 +397,7 @@ namespace MoneyManagerService.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.Role", null)
+                    b.HasOne("MoneyManagerService.Entities.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -406,7 +406,7 @@ namespace MoneyManagerService.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.User", null)
+                    b.HasOne("MoneyManagerService.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -415,7 +415,7 @@ namespace MoneyManagerService.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.User", null)
+                    b.HasOne("MoneyManagerService.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -424,16 +424,16 @@ namespace MoneyManagerService.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.User", null)
+                    b.HasOne("MoneyManagerService.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.Budget", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.Budget", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.User", "User")
+                    b.HasOne("MoneyManagerService.Entities.User", "User")
                         .WithMany("Budgets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -442,9 +442,9 @@ namespace MoneyManagerService.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.Expense", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.Expense", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.Budget", "Budget")
+                    b.HasOne("MoneyManagerService.Entities.Budget", "Budget")
                         .WithMany("Expenses")
                         .HasForeignKey("BudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -453,9 +453,9 @@ namespace MoneyManagerService.Migrations
                     b.Navigation("Budget");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.Income", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.Income", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.Budget", "Budget")
+                    b.HasOne("MoneyManagerService.Entities.Budget", "Budget")
                         .WithMany("Incomes")
                         .HasForeignKey("BudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -464,37 +464,37 @@ namespace MoneyManagerService.Migrations
                     b.Navigation("Budget");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.RefreshToken", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.RefreshToken", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.User", "User")
+                    b.HasOne("MoneyManagerService.Entities.User", "User")
                         .WithOne("RefreshToken")
-                        .HasForeignKey("MoneyManagerService.Models.Domain.RefreshToken", "UserId")
+                        .HasForeignKey("MoneyManagerService.Entities.RefreshToken", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.TaxLiability", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.TaxLiability", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.Budget", "Budget")
+                    b.HasOne("MoneyManagerService.Entities.Budget", "Budget")
                         .WithOne("TaxLiability")
-                        .HasForeignKey("MoneyManagerService.Models.Domain.TaxLiability", "BudgetId")
+                        .HasForeignKey("MoneyManagerService.Entities.TaxLiability", "BudgetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Budget");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.UserRole", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.UserRole", b =>
                 {
-                    b.HasOne("MoneyManagerService.Models.Domain.Role", "Role")
+                    b.HasOne("MoneyManagerService.Entities.Role", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MoneyManagerService.Models.Domain.User", "User")
+                    b.HasOne("MoneyManagerService.Entities.User", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -505,7 +505,7 @@ namespace MoneyManagerService.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.Budget", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.Budget", b =>
                 {
                     b.Navigation("Expenses");
 
@@ -514,12 +514,12 @@ namespace MoneyManagerService.Migrations
                     b.Navigation("TaxLiability");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.Role", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.Role", b =>
                 {
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("MoneyManagerService.Models.Domain.User", b =>
+            modelBuilder.Entity("MoneyManagerService.Entities.User", b =>
                 {
                     b.Navigation("Budgets");
 

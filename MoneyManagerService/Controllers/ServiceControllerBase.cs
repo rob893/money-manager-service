@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using MoneyManagerService.Core;
 using MoneyManagerService.Extensions;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 
 namespace MoneyManagerService.Controllers
 {

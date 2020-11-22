@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 
 namespace MoneyManagerService.Models.DTOs
 {

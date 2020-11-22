@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using System.Linq;
 using MoneyManagerService.Models.DTOs;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using MoneyManagerService.Models.Settings;
 using MoneyManagerService.Data.Repositories;
 

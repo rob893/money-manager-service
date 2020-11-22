@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using MoneyManagerService.Core;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using Newtonsoft.Json;
 
 namespace MoneyManagerService.Models.Responses

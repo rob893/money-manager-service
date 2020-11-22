@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 
 namespace MoneyManagerService.Data
 {

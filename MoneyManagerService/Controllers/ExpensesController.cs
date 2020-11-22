@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using AutoMapper;
 using MoneyManagerService.Data.Repositories;
 using MoneyManagerService.Models.DTOs.Expense;

@@ -5,7 +5,7 @@ using System.Net.Http;
 using Microsoft.Extensions.Options;
 using MoneyManagerService.Models.Settings;
 using Newtonsoft.Json;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using System.Linq;
 
 namespace MoneyManagerService.Services

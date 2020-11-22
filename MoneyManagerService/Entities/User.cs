@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
-namespace MoneyManagerService.Models.Domain
+namespace MoneyManagerService.Entities
 {
     public class User : IdentityUser<int>, IIdentifiable<int>
     {

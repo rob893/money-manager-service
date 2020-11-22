@@ -11,20 +11,16 @@ namespace MoneyManagerService.Middleware
 {
     public class GlobalExceptionHandlerMiddleware
     {
-        private readonly RequestDelegate next;
         private readonly ILogger<GlobalExceptionHandlerMiddleware> logger;
 
 
-        public GlobalExceptionHandlerMiddleware(RequestDelegate next, ILogger<GlobalExceptionHandlerMiddleware> logger)
+        public GlobalExceptionHandlerMiddleware(RequestDelegate _, ILogger<GlobalExceptionHandlerMiddleware> logger)
         {
-            this.next = next;
             this.logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
-            logger.LogDebug(next.Method.Name);
-
             var error = context.Features.Get<IExceptionHandlerFeature>();
 
             if (error != null)
@@ -40,6 +36,8 @@ namespace MoneyManagerService.Middleware
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
                 };
+
+                logger.LogError(thrownException.Message);
 
                 await context.Response.WriteAsync(JsonSerializer.Serialize(problemDetails, jsonOptions));
             }

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace MoneyManagerService.Models.Domain
+namespace MoneyManagerService.Entities
 {
     public class UserRole : IdentityUserRole<int>
     {

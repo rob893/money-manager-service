@@ -2,7 +2,7 @@ using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using MoneyManagerService.Models.DTOs;
 using MoneyManagerService.Models.DTOs.Budget;
 using MoneyManagerService.Models.DTOs.Expense;

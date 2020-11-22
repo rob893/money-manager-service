@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace MoneyManagerService.Models.Domain
+namespace MoneyManagerService.Entities
 {
     public class RefreshToken : IOwnedByUser<int>
     {

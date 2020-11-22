@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using MoneyManagerService.Services;
 using System.Threading.Tasks;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using MoneyManagerService.Models.Responses.Taxee;
 using AutoMapper;
 using MoneyManagerService.Models.DTOs;

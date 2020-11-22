@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace MoneyManagerService.Models.Domain
+namespace MoneyManagerService.Entities
 {
     public class Budget : IIdentifiable<int>, IOwnedByUser<int>
     {

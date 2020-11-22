@@ -8,7 +8,7 @@ using MoneyManagerService.Data.Repositories;
 using MoneyManagerService.Models.QueryParameters;
 using MoneyManagerService.Models.DTOs;
 using MoneyManagerService.Models.Responses;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using MoneyManagerService.Constants;
 using Microsoft.AspNetCore.JsonPatch;
 using MoneyManagerService.Extensions;

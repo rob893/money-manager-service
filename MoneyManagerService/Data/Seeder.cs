@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using Newtonsoft.Json;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;

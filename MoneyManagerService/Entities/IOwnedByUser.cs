@@ -1,6 +1,6 @@
 using System;
 
-namespace MoneyManagerService.Models.Domain
+namespace MoneyManagerService.Entities
 {
     public interface IOwnedByUser<TKey> where TKey : IEquatable<TKey>, IComparable<TKey>
     {

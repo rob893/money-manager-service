@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using MoneyManagerService.Data;
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 
 namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
 {

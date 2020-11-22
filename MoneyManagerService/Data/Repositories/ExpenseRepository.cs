@@ -1,4 +1,4 @@
-using MoneyManagerService.Models.Domain;
+using MoneyManagerService.Entities;
 using MoneyManagerService.Models.QueryParameters;
 
 namespace MoneyManagerService.Data.Repositories

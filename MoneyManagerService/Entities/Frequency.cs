@@ -1,4 +1,4 @@
-namespace MoneyManagerService.Models.Domain
+namespace MoneyManagerService.Entities
 {
     public enum Frequency
     {
