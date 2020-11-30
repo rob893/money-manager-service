@@ -63,6 +63,8 @@ namespace MoneyManagerService.Controllers
         {
             var newBudget = mapper.Map<Budget>(budgetForCreateDto);
 
+            newBudget.TaxLiability = new TaxLiability();
+
             if (!IsUserAuthorizedForResource(newBudget))
             {
                 return Unauthorized("You can only create budgets for yourself.");

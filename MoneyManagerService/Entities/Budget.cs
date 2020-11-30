@@ -14,7 +14,7 @@ namespace MoneyManagerService.Entities
         public List<Expense> Expenses { get; set; } = new List<Expense>();
         [JsonConverter(typeof(StringEnumConverter))]
         public TaxFilingStatus TaxFilingStatus { get; set; } = TaxFilingStatus.Single;
-        public TaxLiability? TaxLiability { get; set; }
+        public TaxLiability TaxLiability { get; set; } = default!;
         public List<Income> Incomes { get; set; } = new List<Income>();
     }
 }

@@ -509,7 +509,8 @@ namespace MoneyManagerService.Migrations
 
                     b.Navigation("Incomes");
 
-                    b.Navigation("TaxLiability");
+                    b.Navigation("TaxLiability")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MoneyManagerService.Entities.Role", b =>
