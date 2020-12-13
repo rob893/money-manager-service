@@ -6,6 +6,9 @@ using MoneyManagerService.Entities;
 using MoneyManagerService.Models.DTOs;
 using MoneyManagerService.Models.DTOs.Budget;
 using MoneyManagerService.Models.DTOs.Expense;
+using MoneyManagerService.Models.DTOs.Income;
+using MoneyManagerService.Models.DTOs.TaxLiability;
+using MoneyManagerService.Models.QueryParameters;
 
 namespace MoneyManagerService.Core
 {
@@ -13,9 +16,17 @@ namespace MoneyManagerService.Core
     {
         public AutoMapperProfiles()
         {
+            CreateCursorPaginationMaps();
             CreateUserMaps();
             CreateBudgetMaps();
             CreateExpenseMaps();
+            CreateIncomeMaps();
+            CreateTaxLiabilityMaps();
+        }
+
+        private void CreateCursorPaginationMaps()
+        {
+            CreateMap<CursorPaginationParameters, BudgetQueryParameters>();
         }
 
         private void CreateUserMaps()
@@ -43,6 +54,17 @@ namespace MoneyManagerService.Core
             CreateMap<ExpenseForCreateDto, Expense>();
             CreateMap<JsonPatchDocument<ExpenseForUpdateDto>, JsonPatchDocument<Expense>>();
             CreateMap<Operation<ExpenseForUpdateDto>, Operation<Expense>>();
+        }
+
+        private void CreateIncomeMaps()
+        {
+            CreateMap<Income, IncomeForReturnDto>();
+            CreateMap<IncomeForCreateDto, Income>();
+        }
+
+        private void CreateTaxLiabilityMaps()
+        {
+            CreateMap<TaxLiability, TaxLiabilityForReturnDto>();
         }
     }
 }

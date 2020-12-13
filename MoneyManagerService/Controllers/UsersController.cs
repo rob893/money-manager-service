@@ -12,6 +12,7 @@ using MoneyManagerService.Entities;
 using MoneyManagerService.Constants;
 using Microsoft.AspNetCore.JsonPatch;
 using MoneyManagerService.Extensions;
+using MoneyManagerService.Models.DTOs.Budget;
 
 namespace MoneyManagerService.Controllers
 {
@@ -20,20 +21,22 @@ namespace MoneyManagerService.Controllers
     public class UsersController : ServiceControllerBase
     {
         private readonly UserRepository userRepository;
+        private readonly BudgetRepository budgetRepository;
         private readonly IMapper mapper;
 
 
-        public UsersController(UserRepository userRepository, IMapper mapper)
+        public UsersController(UserRepository userRepository, BudgetRepository budgetRepository, IMapper mapper)
         {
             this.userRepository = userRepository;
+            this.budgetRepository = budgetRepository;
             this.mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<CursorPaginatedResponse<UserForReturnDto, int>>> GetUsersAsync([FromQuery] CursorPaginationParameters searchParams)
+        public async Task<ActionResult<CursorPaginatedResponse<UserForReturnDto>>> GetUsersAsync([FromQuery] CursorPaginationParameters searchParams)
         {
             var users = await userRepository.SearchAsync(searchParams);
-            var paginatedResponse = CursorPaginatedResponse<UserForReturnDto, int>.CreateFrom(users, mapper.Map<IEnumerable<UserForReturnDto>>);
+            var paginatedResponse = CursorPaginatedResponse<UserForReturnDto>.CreateFrom(users, mapper.Map<IEnumerable<UserForReturnDto>>, searchParams);
 
             return Ok(paginatedResponse);
         }
@@ -51,6 +54,24 @@ namespace MoneyManagerService.Controllers
             var userToReturn = mapper.Map<UserForReturnDto>(user);
 
             return Ok(userToReturn);
+        }
+
+        [HttpGet("{userId}/budgets")]
+        public async Task<ActionResult<CursorPaginatedResponse<BudgetForReturnDto>>> GetBudgetsForUserAsync([FromRoute] int userId, [FromQuery] CursorPaginationParameters searchParams)
+        {
+            if (!IsUserAuthorizedForResource(userId))
+            {
+                return Unauthorized("You can only access your own budgets.");
+            }
+
+            var budgetParams = mapper.Map<BudgetQueryParameters>(searchParams);
+            budgetParams.UserIds.Add(userId);
+
+            var budgets = await budgetRepository.SearchAsync(budgetParams);
+
+            var paginatedResponse = CursorPaginatedResponse<BudgetForReturnDto>.CreateFrom(budgets, mapper.Map<IEnumerable<BudgetForReturnDto>>, budgetParams);
+
+            return Ok(paginatedResponse);
         }
 
         [HttpPatch("{id}")]
@@ -98,7 +119,7 @@ namespace MoneyManagerService.Controllers
         public async Task<ActionResult<CursorPaginatedResponse<RoleForReturnDto>>> GetRolesAsync([FromQuery] CursorPaginationParameters searchParams)
         {
             var roles = await userRepository.GetRolesAsync(searchParams);
-            var paginatedResponse = CursorPaginatedResponse<RoleForReturnDto>.CreateFrom(roles, mapper.Map<IEnumerable<RoleForReturnDto>>, searchParams.IncludeNodes, searchParams.IncludeEdges);
+            var paginatedResponse = CursorPaginatedResponse<RoleForReturnDto>.CreateFrom(roles, mapper.Map<IEnumerable<RoleForReturnDto>>, searchParams);
 
             return Ok(paginatedResponse);
         }

@@ -12,6 +12,7 @@ using MoneyManagerService.Constants;
 using Microsoft.AspNetCore.JsonPatch;
 using MoneyManagerService.Extensions;
 using System.Collections.Generic;
+using MoneyManagerService.Models.DTOs.Income;
 
 namespace MoneyManagerService.Controllers
 {
@@ -30,7 +31,7 @@ namespace MoneyManagerService.Controllers
 
         [Authorize(Policy = AuthorizationPolicyName.RequireAdminRole)]
         [HttpGet]
-        public async Task<ActionResult<CursorPaginatedResponse<BudgetForReturnDto>>> GetBudgetsAsync([FromQuery] CursorPaginationParameters searchParams)
+        public async Task<ActionResult<CursorPaginatedResponse<BudgetForReturnDto>>> GetBudgetsAsync([FromQuery] BudgetQueryParameters searchParams)
         {
             var budgets = await budgetRepository.SearchAsync(searchParams);
             var paginatedResponse = CursorPaginatedResponse<BudgetForReturnDto>.CreateFrom(budgets, mapper.Map<IEnumerable<BudgetForReturnDto>>, searchParams.IncludeNodes, searchParams.IncludeEdges);
@@ -197,6 +198,38 @@ namespace MoneyManagerService.Controllers
             var expenseToReturn = mapper.Map<ExpenseForReturnDto>(newExpense);
 
             return CreatedAtRoute("GetExpenseAsync", new { id = expenseToReturn.Id }, expenseToReturn);
+        }
+
+        [HttpPost("{id}/incomes")]
+        public async Task<ActionResult<IncomeForReturnDto>> CreateIncomeForBudgetAsync([FromRoute] int id, [FromBody] IncomeForCreateDto incomeForCreateDto)
+        {
+            var budget = await budgetRepository.GetByIdAsync(id);
+
+            if (budget == null)
+            {
+                return NotFound($"No Budget with id {id} found.");
+            }
+
+            if (!IsUserAuthorizedForResource(budget))
+            {
+                return Unauthorized("You can only access your own budget.");
+            }
+
+            var newIncome = mapper.Map<Income>(incomeForCreateDto);
+            newIncome.BudgetId = id;
+
+            budget.Incomes.Add(newIncome);
+
+            var saveResult = await budgetRepository.SaveAllAsync();
+
+            if (!saveResult)
+            {
+                return BadRequest("Unable to create income.");
+            }
+
+            var incomeToReturn = mapper.Map<IncomeForReturnDto>(newIncome);
+
+            return CreatedAtRoute("GetExpenseAsync", new { id = incomeToReturn.Id }, incomeToReturn);
         }
     }
 }

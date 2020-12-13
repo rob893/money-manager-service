@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MoneyManagerService.Core;
 using MoneyManagerService.Entities;
+using MoneyManagerService.Models.QueryParameters;
 using Newtonsoft.Json;
 
 namespace MoneyManagerService.Models.Responses
@@ -63,6 +64,13 @@ namespace MoneyManagerService.Models.Responses
             var mappedItems = mappingFunction(items);
 
             return new CursorPaginatedResponse<TDestination, int>(mappedItems, items.StartCursor, items.EndCursor, items.HasNextPage, items.HasPreviousPage, items.TotalCount, Id => Convert.ToBase64String(BitConverter.GetBytes(Id)), includeNodes, includeEdges);
+        }
+
+        public static CursorPaginatedResponse<TDestination, int> CreateFrom<TSource, TDestination>(CursorPagedList<TSource, int> items, Func<IEnumerable<TSource>, IEnumerable<TDestination>> mappingFunction, CursorPaginationParameters searchParams)
+            where TSource : class, IIdentifiable<int>
+            where TDestination : class, IIdentifiable<int>
+        {
+            return CursorPaginatedResponse<TDestination, int>.CreateFrom(items, mappingFunction, searchParams.IncludeNodes, searchParams.IncludeEdges);
         }
 
         public static CursorPaginatedResponse<TSource, int> CreateFrom<TSource>(CursorPagedList<TSource, int> items, bool includeNodes = true, bool includeEdges = true)

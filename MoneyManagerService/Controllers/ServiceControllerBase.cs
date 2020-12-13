@@ -25,6 +25,22 @@ namespace MoneyManagerService.Controllers
         }
 
         [NonAction]
+        public bool IsUserAuthorizedForResource(int userIdInQuestion, bool isAdminAuthorized = true)
+        {
+            if (isAdminAuthorized && User.IsAdmin())
+            {
+                return true;
+            }
+
+            if (User.TryGetUserId(out int? userId) && userId == userIdInQuestion)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        [NonAction]
         public NotFoundObjectResult NotFound(string errorMessage)
         {
             return base.NotFound(new ProblemDetailsWithErrors(errorMessage, 404, Request));
