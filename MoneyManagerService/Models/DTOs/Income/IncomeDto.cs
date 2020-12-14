@@ -4,7 +4,7 @@ using Newtonsoft.Json.Converters;
 
 namespace MoneyManagerService.Models.DTOs.Income
 {
-    public record IncomeForReturnDto : IIdentifiable<int>
+    public record IncomeDto : IIdentifiable<int>
     {
         public int Id { get; init; }
         public int BudgetId { get; init; }

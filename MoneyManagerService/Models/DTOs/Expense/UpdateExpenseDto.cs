@@ -2,7 +2,7 @@ using MoneyManagerService.Entities;
 
 namespace MoneyManagerService.Models.DTOs.Expense
 {
-    public record ExpenseForUpdateDto
+    public record UpdateExpenseDto
     {
         public string Name { get; init; } = default!;
         public string? Description { get; init; }

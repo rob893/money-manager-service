@@ -33,16 +33,16 @@ namespace MoneyManagerService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<CursorPaginatedResponse<UserForReturnDto>>> GetUsersAsync([FromQuery] CursorPaginationParameters searchParams)
+        public async Task<ActionResult<CursorPaginatedResponse<UserDto>>> GetUsersAsync([FromQuery] CursorPaginationParameters searchParams)
         {
             var users = await userRepository.SearchAsync(searchParams);
-            var paginatedResponse = CursorPaginatedResponse<UserForReturnDto>.CreateFrom(users, mapper.Map<IEnumerable<UserForReturnDto>>, searchParams);
+            var paginatedResponse = CursorPaginatedResponse<UserDto>.CreateFrom(users, mapper.Map<IEnumerable<UserDto>>, searchParams);
 
             return Ok(paginatedResponse);
         }
 
         [HttpGet("{id}", Name = "GetUserAsync")]
-        public async Task<ActionResult<UserForReturnDto>> GetUserAsync(int id)
+        public async Task<ActionResult<UserDto>> GetUserAsync(int id)
         {
             var user = await userRepository.GetByIdAsync(id);
 
@@ -51,13 +51,13 @@ namespace MoneyManagerService.Controllers
                 return NotFound($"User with id {id} does not exist.");
             }
 
-            var userToReturn = mapper.Map<UserForReturnDto>(user);
+            var userToReturn = mapper.Map<UserDto>(user);
 
             return Ok(userToReturn);
         }
 
         [HttpGet("{userId}/budgets")]
-        public async Task<ActionResult<CursorPaginatedResponse<BudgetForReturnDto>>> GetBudgetsForUserAsync([FromRoute] int userId, [FromQuery] CursorPaginationParameters searchParams)
+        public async Task<ActionResult<CursorPaginatedResponse<BudgetDto>>> GetBudgetsForUserAsync([FromRoute] int userId, [FromQuery] CursorPaginationParameters searchParams)
         {
             if (!IsUserAuthorizedForResource(userId))
             {
@@ -69,13 +69,13 @@ namespace MoneyManagerService.Controllers
 
             var budgets = await budgetRepository.SearchAsync(budgetParams);
 
-            var paginatedResponse = CursorPaginatedResponse<BudgetForReturnDto>.CreateFrom(budgets, mapper.Map<IEnumerable<BudgetForReturnDto>>, budgetParams);
+            var paginatedResponse = CursorPaginatedResponse<BudgetDto>.CreateFrom(budgets, mapper.Map<IEnumerable<BudgetDto>>, budgetParams);
 
             return Ok(paginatedResponse);
         }
 
         [HttpPatch("{id}")]
-        public async Task<ActionResult<UserForReturnDto>> UpdateUserAsync(int id, [FromBody] JsonPatchDocument<UserForUpdateDto> dtoPatchDoc)
+        public async Task<ActionResult<UserDto>> UpdateUserAsync(int id, [FromBody] JsonPatchDocument<UpdateUserDto> dtoPatchDoc)
         {
             if (dtoPatchDoc == null || dtoPatchDoc.Operations.Count == 0)
             {
@@ -110,23 +110,23 @@ namespace MoneyManagerService.Controllers
 
             await userRepository.SaveAllAsync();
 
-            var userToReturn = mapper.Map<UserForReturnDto>(user);
+            var userToReturn = mapper.Map<UserDto>(user);
 
             return Ok(userToReturn);
         }
 
         [HttpGet("roles")]
-        public async Task<ActionResult<CursorPaginatedResponse<RoleForReturnDto>>> GetRolesAsync([FromQuery] CursorPaginationParameters searchParams)
+        public async Task<ActionResult<CursorPaginatedResponse<RoleDto>>> GetRolesAsync([FromQuery] CursorPaginationParameters searchParams)
         {
             var roles = await userRepository.GetRolesAsync(searchParams);
-            var paginatedResponse = CursorPaginatedResponse<RoleForReturnDto>.CreateFrom(roles, mapper.Map<IEnumerable<RoleForReturnDto>>, searchParams);
+            var paginatedResponse = CursorPaginatedResponse<RoleDto>.CreateFrom(roles, mapper.Map<IEnumerable<RoleDto>>, searchParams);
 
             return Ok(paginatedResponse);
         }
 
         [Authorize(Policy = AuthorizationPolicyName.RequireAdminRole)]
         [HttpPost("{id}/roles")]
-        public async Task<ActionResult<UserForReturnDto>> AddRolesAsync(int id, [FromBody] RoleEditDto roleEditDto)
+        public async Task<ActionResult<UserDto>> AddRolesAsync(int id, [FromBody] EditRoleDto roleEditDto)
         {
             if (roleEditDto.RoleNames == null || roleEditDto.RoleNames.Length == 0)
             {
@@ -146,7 +146,7 @@ namespace MoneyManagerService.Controllers
 
             if (!rolesToAdd.Any())
             {
-                return Ok(mapper.Map<UserForReturnDto>(user));
+                return Ok(mapper.Map<UserDto>(user));
             }
 
             user.UserRoles.AddRange(rolesToAdd.Select(role => new UserRole
@@ -161,14 +161,14 @@ namespace MoneyManagerService.Controllers
                 return BadRequest("Failed to add roles.");
             }
 
-            var userToReturn = mapper.Map<UserForReturnDto>(user);
+            var userToReturn = mapper.Map<UserDto>(user);
 
             return Ok(userToReturn);
         }
 
         [Authorize(Policy = AuthorizationPolicyName.RequireAdminRole)]
         [HttpDelete("{id}/roles")]
-        public async Task<ActionResult<UserForReturnDto>> RemoveRolesAsync(int id, [FromBody] RoleEditDto roleEditDto)
+        public async Task<ActionResult<UserDto>> RemoveRolesAsync(int id, [FromBody] EditRoleDto roleEditDto)
         {
             if (roleEditDto.RoleNames == null || roleEditDto.RoleNames.Length == 0)
             {
@@ -188,7 +188,7 @@ namespace MoneyManagerService.Controllers
 
             if (roleIdsToRemove.Count == 0)
             {
-                return Ok(mapper.Map<UserForReturnDto>(user));
+                return Ok(mapper.Map<UserDto>(user));
             }
 
             user.UserRoles.RemoveAll(ur => roleIdsToRemove.Contains(ur.RoleId));
@@ -199,7 +199,7 @@ namespace MoneyManagerService.Controllers
                 return BadRequest("Failed to remove roles.");
             }
 
-            var userToReturn = mapper.Map<UserForReturnDto>(user);
+            var userToReturn = mapper.Map<UserDto>(user);
 
             return Ok(userToReturn);
         }

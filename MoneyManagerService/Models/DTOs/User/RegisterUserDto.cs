@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MoneyManagerService.Models.DTOs
 {
-    public record UserForRegisterDto
+    public record RegisterUserDto
     {
         [Required]
         public string UserName { get; init; } = default!;
@@ -26,7 +26,7 @@ namespace MoneyManagerService.Models.DTOs
         public DateTimeOffset Created { get; init; }
 
 
-        public UserForRegisterDto()
+        public RegisterUserDto()
         {
             Created = DateTimeOffset.UtcNow;
         }

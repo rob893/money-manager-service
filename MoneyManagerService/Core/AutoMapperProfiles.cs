@@ -31,40 +31,41 @@ namespace MoneyManagerService.Core
 
         private void CreateUserMaps()
         {
-            CreateMap<User, UserForReturnDto>().ConstructUsing(x => new UserForReturnDto())
+            CreateMap<User, UserDto>().ConstructUsing(x => new UserDto())
                 .ForMember(dto => dto.Roles, opt =>
                     opt.MapFrom(u => u.UserRoles.Select(ur => ur.Role.Name)));
-            CreateMap<UserForRegisterDto, User>();
-            CreateMap<Role, RoleForReturnDto>();
-            CreateMap<JsonPatchDocument<UserForUpdateDto>, JsonPatchDocument<User>>();
-            CreateMap<Operation<UserForUpdateDto>, Operation<User>>();
+            CreateMap<RegisterUserDto, User>();
+            CreateMap<Role, RoleDto>();
+            CreateMap<JsonPatchDocument<UpdateUserDto>, JsonPatchDocument<User>>();
+            CreateMap<Operation<UpdateUserDto>, Operation<User>>();
         }
 
         private void CreateBudgetMaps()
         {
-            CreateMap<Budget, BudgetForReturnDto>();
-            CreateMap<BudgetForCreateDto, Budget>();
-            CreateMap<JsonPatchDocument<BudgetForUpdateDto>, JsonPatchDocument<Budget>>();
-            CreateMap<Operation<BudgetForUpdateDto>, Operation<Budget>>();
+            CreateMap<Budget, BudgetDto>();
+            CreateMap<CreateBudgetDto, Budget>();
+            CreateMap<JsonPatchDocument<UpdateBudgetDto>, JsonPatchDocument<Budget>>();
+            CreateMap<Operation<UpdateBudgetDto>, Operation<Budget>>();
         }
 
         private void CreateExpenseMaps()
         {
-            CreateMap<Expense, ExpenseForReturnDto>();
-            CreateMap<ExpenseForCreateDto, Expense>();
-            CreateMap<JsonPatchDocument<ExpenseForUpdateDto>, JsonPatchDocument<Expense>>();
-            CreateMap<Operation<ExpenseForUpdateDto>, Operation<Expense>>();
+            CreateMap<Expense, CreateExpenseForBudgetDto>();
+            CreateMap<Expense, ExpenseDto>();
+            CreateMap<CreateExpenseDto, Expense>();
+            CreateMap<JsonPatchDocument<UpdateExpenseDto>, JsonPatchDocument<Expense>>();
+            CreateMap<Operation<UpdateExpenseDto>, Operation<Expense>>();
         }
 
         private void CreateIncomeMaps()
         {
-            CreateMap<Income, IncomeForReturnDto>();
-            CreateMap<IncomeForCreateDto, Income>();
+            CreateMap<Income, IncomeDto>();
+            CreateMap<CreateIncomeDto, Income>();
         }
 
         private void CreateTaxLiabilityMaps()
         {
-            CreateMap<TaxLiability, TaxLiabilityForReturnDto>();
+            CreateMap<TaxLiability, TaxLiabilityDto>();
         }
     }
 }

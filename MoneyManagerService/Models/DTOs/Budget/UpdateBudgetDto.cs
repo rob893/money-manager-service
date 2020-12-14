@@ -1,6 +1,6 @@
 namespace MoneyManagerService.Models.DTOs.Budget
 {
-    public record BudgetForUpdateDto
+    public record UpdateBudgetDto
     {
         public string? Description { get; init; }
     }

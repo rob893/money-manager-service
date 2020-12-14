@@ -36,13 +36,13 @@ namespace MoneyManagerService.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<UserForReturnDto>> RegisterAsync([FromBody] UserForRegisterDto userForRegisterDto)
+        public async Task<ActionResult<UserDto>> RegisterAsync([FromBody] RegisterUserDto userForRegisterDto)
         {
             var userToCreate = mapper.Map<User>(userForRegisterDto);
 
             var result = await userRepository.CreateUserWithPasswordAsync(userToCreate, userForRegisterDto.Password);
 
-            var userToReturn = mapper.Map<UserForReturnDto>(userToCreate);
+            var userToReturn = mapper.Map<UserDto>(userToCreate);
 
             if (!result.Succeeded)
             {
@@ -58,7 +58,7 @@ namespace MoneyManagerService.Controllers
         /// <param name="userForLoginDto"></param>
         /// <returns>200 with user object on success. 401 on failure.</returns>
         [HttpPost("login")]
-        public async Task<ActionResult<LoginForReturnDto>> LoginAsync([FromBody] UserForLoginDto userForLoginDto)
+        public async Task<ActionResult<UserLoginDto>> LoginAsync([FromBody] LoginUserDto userForLoginDto)
         {
             var user = await userRepository.GetByUsernameAsync(userForLoginDto.Username, user => user.RefreshToken!);
 
@@ -85,9 +85,9 @@ namespace MoneyManagerService.Controllers
 
             await userRepository.SaveAllAsync();
 
-            var userToReturn = mapper.Map<UserForReturnDto>(user);
+            var userToReturn = mapper.Map<UserDto>(user);
 
-            return Ok(new LoginForReturnDto
+            return Ok(new UserLoginDto
             {
                 Token = token,
                 RefreshToken = refreshToken,

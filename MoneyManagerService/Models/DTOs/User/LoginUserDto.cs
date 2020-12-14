@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MoneyManagerService.Models.DTOs
 {
-    public record UserForLoginDto
+    public record LoginUserDto
     {
         [Required]
         public string Username { get; init; } = default!;

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Converters;
 
 namespace MoneyManagerService.Models.DTOs.Budget
 {
-    public record BudgetForReturnDto : IIdentifiable<int>, IOwnedByUser<int>
+    public record BudgetDto : IIdentifiable<int>, IOwnedByUser<int>
     {
         public int Id { get; init; }
         public int UserId { get; init; }
@@ -16,8 +16,8 @@ namespace MoneyManagerService.Models.DTOs.Budget
         public string? Description { get; init; }
         [JsonConverter(typeof(StringEnumConverter))]
         public TaxFilingStatus TaxFilingStatus { get; init; }
-        public TaxLiabilityForReturnDto TaxLiability { get; set; } = default!;
-        public List<IncomeForReturnDto> Incomes { get; init; } = new List<IncomeForReturnDto>();
-        public List<ExpenseForReturnDto> Expenses { get; init; } = new List<ExpenseForReturnDto>();
+        public TaxLiabilityDto TaxLiability { get; set; } = default!;
+        public List<IncomeDto> Incomes { get; init; } = new List<IncomeDto>();
+        public List<ExpenseDto> Expenses { get; init; } = new List<ExpenseDto>();
     }
 }

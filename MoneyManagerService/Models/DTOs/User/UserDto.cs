@@ -4,7 +4,7 @@ using MoneyManagerService.Entities;
 
 namespace MoneyManagerService.Models.DTOs
 {
-    public record UserForReturnDto : IIdentifiable<int>
+    public record UserDto : IIdentifiable<int>
     {
         public int Id { get; init; }
         public string UserName { get; init; } = default!;

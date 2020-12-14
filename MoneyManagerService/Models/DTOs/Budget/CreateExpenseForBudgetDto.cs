@@ -3,13 +3,14 @@ using MoneyManagerService.Entities;
 
 namespace MoneyManagerService.Models.DTOs.Budget
 {
-    public record BudgetForCreateDto
+    public record CreateExpenseForBudgetDto
     {
         [Required]
         public string Name { get; init; } = default!;
-        [Required]
-        public int? UserId { get; init; }
         public string? Description { get; init; }
-        public TaxFilingStatus? TaxFilingStatus { get; init; }
+        [Required]
+        public double? Amount { get; init; }
+        [Required]
+        public Frequency? Frequency { get; init; }
     }
 }

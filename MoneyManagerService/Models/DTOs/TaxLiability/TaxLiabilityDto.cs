@@ -1,10 +1,8 @@
 using MoneyManagerService.Entities;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace MoneyManagerService.Models.DTOs.TaxLiability
 {
-    public record TaxLiabilityForReturnDto : IIdentifiable<int>
+    public record TaxLiabilityDto : IIdentifiable<int>
     {
         public int Id { get; set; }
         public int BudgetId { get; set; }

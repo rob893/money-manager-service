@@ -2,7 +2,7 @@ using MoneyManagerService.Entities;
 
 namespace MoneyManagerService.Models.DTOs
 {
-    public record RoleForReturnDto : IIdentifiable<int>
+    public record RoleDto : IIdentifiable<int>
     {
         public int Id { get; init; }
         public string Name { get; init; } = default!;

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MoneyManagerService.Models.DTOs
 {
-    public record UserForUpdateDto
+    public record UpdateUserDto
     {
         [MaxLength(255)]
         public string? FirstName { get; init; }

@@ -3,7 +3,7 @@ using MoneyManagerService.Entities;
 
 namespace MoneyManagerService.Models.DTOs.Income
 {
-    public record IncomeForCreateDto
+    public record CreateIncomeDto
     {
         [Required]
         public int? BudgetId { get; init; }
