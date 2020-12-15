@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "MoneyManagerService\\bin\\Release\\netcoreapp5.0\\publish",
+    "appService.defaultWebAppToDeploy": "/subscriptions/6ad65839-cae9-4db7-abee-f5f6b93bab39/resourceGroups/rherber-development/providers/Microsoft.Web/sites/rherber-money-manager-service"
+}

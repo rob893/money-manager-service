@@ -36,7 +36,7 @@ namespace MoneyManagerService.Data.Repositories
             IQueryable<User> query = context.Users;
             query = AddIncludes(query);
 
-            return query.FirstOrDefaultAsync(user => user.UserName == username);
+            return query.OrderBy(e => e.Id).FirstOrDefaultAsync(user => user.UserName == username);
         }
 
         public Task<User> GetByUsernameAsync(string username, params Expression<Func<User, object>>[] includes)
@@ -46,7 +46,7 @@ namespace MoneyManagerService.Data.Repositories
             query = AddIncludes(query);
             query = includes.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
 
-            return query.FirstOrDefaultAsync(user => user.UserName == username);
+            return query.OrderBy(e => e.Id).FirstOrDefaultAsync(user => user.UserName == username);
         }
 
         public async Task<bool> CheckPasswordAsync(User user, string password)

@@ -69,7 +69,7 @@ namespace MoneyManagerService.Data.Repositories
 
             query = AddIncludes(query);
 
-            return query.FirstOrDefaultAsync(e => e.Id.Equals(id));
+            return query.OrderBy(e => e.Id).FirstOrDefaultAsync(e => e.Id.Equals(id));
         }
 
         public Task<TEntity> GetByIdAsync(TEntityKey id, params Expression<Func<TEntity, object>>[] includes)
@@ -79,7 +79,7 @@ namespace MoneyManagerService.Data.Repositories
             query = AddIncludes(query);
             query = includes.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
 
-            return query.FirstOrDefaultAsync(e => e.Id.Equals(id));
+            return query.OrderBy(e => e.Id).FirstOrDefaultAsync(e => e.Id.Equals(id));
         }
 
         public Task<CursorPagedList<TEntity, TEntityKey>> SearchAsync(RSearchParams searchParams)

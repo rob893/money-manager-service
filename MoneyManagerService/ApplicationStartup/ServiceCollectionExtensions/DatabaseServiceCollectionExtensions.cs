@@ -18,7 +18,11 @@ namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
                 dbContextOptions =>
                 {
                     dbContextOptions
-                        .UseMySql(settings.DefaultConnection, ServerVersion.AutoDetect(settings.DefaultConnection), options => options.EnableRetryOnFailure());
+                        .UseMySql(settings.DefaultConnection, ServerVersion.AutoDetect(settings.DefaultConnection), options =>
+                        {
+                            options.EnableRetryOnFailure();
+                            options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                        });
 
                     if (settings.EnableDetailedErrors)
                     {
