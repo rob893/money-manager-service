@@ -10,24 +10,24 @@ namespace MoneyManagerService.Core
     {
         public IEnumerable<string> Errors { get; set; } = new List<string>();
 
-        private readonly Dictionary<int, string> errorTypes = new Dictionary<int, string>
+        private readonly Dictionary<int, string> errorTypes = new()
         {
-            {400, "https://tools.ietf.org/html/rfc7231#section-6.5.1"},
-            {401, "https://tools.ietf.org/html/rfc7235#section-3.1"},
-            {403, "https://tools.ietf.org/html/rfc7231#section-6.5.3"},
-            {404, "https://tools.ietf.org/html/rfc7231#section-6.5.4"},
-            {405, "https://tools.ietf.org/html/rfc7231#section-6.5.5"},
-            {500, "https://tools.ietf.org/html/rfc7231#section-6.6.1"}
+            { 400, "https://tools.ietf.org/html/rfc7231#section-6.5.1" },
+            { 401, "https://tools.ietf.org/html/rfc7235#section-3.1" },
+            { 403, "https://tools.ietf.org/html/rfc7231#section-6.5.3" },
+            { 404, "https://tools.ietf.org/html/rfc7231#section-6.5.4" },
+            { 405, "https://tools.ietf.org/html/rfc7231#section-6.5.5" },
+            { 500, "https://tools.ietf.org/html/rfc7231#section-6.6.1" }
         };
 
-        private readonly Dictionary<int, string> errorTitles = new Dictionary<int, string>
+        private readonly Dictionary<int, string> errorTitles = new()
         {
-            {400, "Bad Request"},
-            {401, "Unauthorized"},
-            {403, "Forbidden"},
-            {404, "Not Found"},
-            {405, "Method Not Allowed"},
-            {500, "Internal Server Error"}
+            { 400, "Bad Request" },
+            { 401, "Unauthorized" },
+            { 403, "Forbidden" },
+            { 404, "Not Found" },
+            { 405, "Method Not Allowed" },
+            { 500, "Internal Server Error" }
         };
 
 
@@ -36,7 +36,7 @@ namespace MoneyManagerService.Core
             SetProblemDetails(errors, statusCode, request);
         }
 
-        public ProblemDetailsWithErrors(string error, int statusCode, HttpRequest request = null) :
+        public ProblemDetailsWithErrors(string error, int statusCode, HttpRequest? request = null) :
             this(new List<string> { error }, statusCode, request)
         { }
 
@@ -65,11 +65,11 @@ namespace MoneyManagerService.Core
             SetProblemDetails(errors, statusCode, request);
         }
 
-        public ProblemDetailsWithErrors(IList<string> errors, HttpRequest request = null) : this(errors, 500, request) { }
+        public ProblemDetailsWithErrors(IList<string> errors, HttpRequest? request = null) : this(errors, 500, request) { }
 
-        public ProblemDetailsWithErrors(string error, HttpRequest request = null) : this(new List<string> { error }, 500, request) { }
+        public ProblemDetailsWithErrors(string error, HttpRequest? request = null) : this(new List<string> { error }, 500, request) { }
 
-        public ProblemDetailsWithErrors(Exception error, HttpRequest request = null) : this(error, 500, request) { }
+        public ProblemDetailsWithErrors(Exception error, HttpRequest? request = null) : this(error, 500, request) { }
 
         private void SetProblemDetails(IList<string> errors, int statusCode, HttpRequest? request)
         {
