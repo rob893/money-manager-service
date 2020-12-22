@@ -14,7 +14,7 @@ using System.Collections.Generic;
 
 namespace MoneyManagerService.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class ExpensesController : ServiceControllerBase
     {

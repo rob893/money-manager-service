@@ -16,7 +16,7 @@ using MoneyManagerService.Models.DTOs.Budget;
 
 namespace MoneyManagerService.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class UsersController : ServiceControllerBase
     {

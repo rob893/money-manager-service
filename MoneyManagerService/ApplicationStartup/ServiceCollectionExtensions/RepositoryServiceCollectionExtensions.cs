@@ -11,6 +11,7 @@ namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
             services.AddScoped<UserRepository>();
             services.AddScoped<BudgetRepository>();
             services.AddScoped<ExpenseRepository>();
+            services.AddScoped<IncomeRepository>();
 
             return services;
         }

@@ -62,6 +62,8 @@ namespace MoneyManagerService.Core
             CreateMap<Income, IncomeDto>();
             CreateMap<CreateIncomeDto, Income>();
             CreateMap<CreateIncomeForBudgetDto, Income>();
+            CreateMap<JsonPatchDocument<UpdateIncomeDto>, JsonPatchDocument<Income>>();
+            CreateMap<Operation<UpdateIncomeDto>, Operation<Income>>();
         }
 
         private void CreateTaxLiabilityMaps()

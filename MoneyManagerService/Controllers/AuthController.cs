@@ -19,7 +19,7 @@ using MoneyManagerService.Data.Repositories;
 namespace MoneyManagerService.Controllers
 {
     [AllowAnonymous]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ServiceControllerBase
     {
