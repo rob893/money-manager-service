@@ -50,8 +50,8 @@ namespace MoneyManagerService.Core
 
         private void CreateExpenseMaps()
         {
-            CreateMap<Expense, CreateExpenseForBudgetDto>();
             CreateMap<Expense, ExpenseDto>();
+            CreateMap<CreateExpenseForBudgetDto, Expense>();
             CreateMap<CreateExpenseDto, Expense>();
             CreateMap<JsonPatchDocument<UpdateExpenseDto>, JsonPatchDocument<Expense>>();
             CreateMap<Operation<UpdateExpenseDto>, Operation<Expense>>();
@@ -61,6 +61,7 @@ namespace MoneyManagerService.Core
         {
             CreateMap<Income, IncomeDto>();
             CreateMap<CreateIncomeDto, Income>();
+            CreateMap<CreateIncomeForBudgetDto, Income>();
         }
 
         private void CreateTaxLiabilityMaps()
