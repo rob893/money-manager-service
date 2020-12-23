@@ -1,6 +1,7 @@
 # This workflow fires off of pushes to master branch. If the head commit message contains '[ci skip]', the whole workflow will be skipped.
 #
 # Secrets used:
+# AZURE_APP_SERVICE_PUBLISH_PROFILE credentials to authenticate with Azure: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
 
 name: Build and Deploy
 
@@ -52,5 +53,5 @@ jobs:
         with:
           app-name: "rherber-money-manager-service"
           slot-name: "production"
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_287934851b874c6e85670d721e2406d5 }}
+          publish-profile: ${{ secrets.AZURE_APP_SERVICE_PUBLISH_PROFILE }}
           package: money-manager-service-b${{ github.run_number }}
