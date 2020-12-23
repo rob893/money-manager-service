@@ -2,6 +2,10 @@
 #
 # Secrets used:
 # AZURE_APP_SERVICE_PUBLISH_PROFILE credentials to authenticate with Azure: https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#generate-deployment-credentials
+# REMOTE_USER: to user to ssh into the remote server as
+# REMOTE_HOST: the IP/Domain to ssh into
+# SERVER_SSH_KEY: the private key that matches the public key on the remote server
+# KNOWN_HOSTS: the known hosts. Run `ssh-keyscan {{ IP/Domain }}` to obtain this
 
 name: Build and Deploy
 
@@ -48,6 +52,14 @@ jobs:
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v2
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          name: id_rsa
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      - name: Download secret settings file
+        run: scp ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/var/www/html/APIs/SettingsFiles/MoneyManagerService/appsettings.Secrets.json ./money-manager-service-b${{ github.run_number }}
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
