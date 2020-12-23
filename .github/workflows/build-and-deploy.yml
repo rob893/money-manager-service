@@ -36,12 +36,12 @@ jobs:
       - name: Build project
         run: |
           cd ./MoneyManagerService
-          dotnet publish -c=Release
+          dotnet publish -c=Release -o build
       - name: Upload build
         uses: actions/upload-artifact@v2
         with:
           name: money-manager-service-b${{ github.run_number }}
-          path: ./MoneyManagerService/bin/Release/netcoreapp5.0
+          path: ./MoneyManagerService/build
 
   deploy:
     name: Deploy to Azure
