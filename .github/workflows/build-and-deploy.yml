@@ -47,5 +47,10 @@ jobs:
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v2
-      - name: List dir
-        run: ls -R
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: "rherber-money-manager-service"
+          slot-name: "production"
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_287934851b874c6e85670d721e2406d5 }}
+          package: money-manager-service-b${{ github.run_number }}
