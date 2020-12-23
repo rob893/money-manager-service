@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "start": "cd MoneyManagerService && dotnet watch run",
+    "clean-dist": "rm -rf MoneyManagerService/dist",
+    "build": "npm run clean-dist && cd MoneyManagerService && dotnet publish -c=Debug -o dist",
+    "build-prod": "npm run clean-dist && cd MoneyManagerService && dotnet publish -c=Debug -o dist",
+    "download-secrets": "scp root@rwherber.com:/var/www/html/APIs/SettingsFiles/MoneyManagerService/appsettings.Secrets.json ./MoneyManagerService",
+    "upload-secrets": "scp ./MoneyManagerService/appsettings.Secrets.json root@rwherber.com:/var/www/html/APIs/SettingsFiles/MoneyManagerService"
+  }
+}
