@@ -95,6 +95,44 @@ namespace MoneyManagerService.Controllers
             });
         }
 
+        [HttpPost("login/google")]
+        public async Task<ActionResult<UserLoginDto>> LoginAsync([FromBody] LoginUserDto userForLoginDto)
+        {
+            var user = await userRepository.GetByUsernameAsync(userForLoginDto.Username, user => user.RefreshToken!);
+
+            if (user == null)
+            {
+                return Unauthorized("Invalid username or password.");
+            }
+
+            var result = await userRepository.CheckPasswordAsync(user, userForLoginDto.Password);
+
+            if (!result)
+            {
+                return Unauthorized("Invalid username or password.");
+            }
+
+            var token = GenerateJwtToken(user);
+            var refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = new RefreshToken
+            {
+                Token = refreshToken,
+                Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
+            };
+
+            await userRepository.SaveAllAsync();
+
+            var userToReturn = mapper.Map<UserDto>(user);
+
+            return Ok(new UserLoginDto
+            {
+                Token = token,
+                RefreshToken = refreshToken,
+                User = userToReturn
+            });
+        }
+
         [HttpPost("refreshToken")]
         public async Task<ActionResult> RefreshTokenAsync([FromBody] RefreshTokenDto refreshTokenDto)
         {

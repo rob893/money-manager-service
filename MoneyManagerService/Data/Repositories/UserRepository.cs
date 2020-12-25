@@ -23,6 +23,14 @@ namespace MoneyManagerService.Data.Repositories
             this.signInManager = signInManager;
         }
 
+        public async Task<IdentityResult> CreateUserWithAsync(User user)
+        {
+            var created = await userManager.CreateAsync(user);
+            await userManager.AddToRoleAsync(user, "User");
+
+            return created;
+        }
+
         public async Task<IdentityResult> CreateUserWithPasswordAsync(User user, string password)
         {
             var created = await userManager.CreateAsync(user, password);
