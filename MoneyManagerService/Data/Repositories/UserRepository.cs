@@ -25,6 +25,7 @@ namespace MoneyManagerService.Data.Repositories
 
         public async Task<IdentityResult> CreateUserWithAsync(User user)
         {
+            user.Created = DateTime.UtcNow;
             var created = await userManager.CreateAsync(user);
             await userManager.AddToRoleAsync(user, "User");
 
@@ -33,6 +34,7 @@ namespace MoneyManagerService.Data.Repositories
 
         public async Task<IdentityResult> CreateUserWithPasswordAsync(User user, string password)
         {
+            user.Created = DateTime.UtcNow;
             var created = await userManager.CreateAsync(user, password);
             await userManager.AddToRoleAsync(user, "User");
 

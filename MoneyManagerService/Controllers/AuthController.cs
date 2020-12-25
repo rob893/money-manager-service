@@ -15,6 +15,8 @@ using MoneyManagerService.Models.DTOs;
 using MoneyManagerService.Entities;
 using MoneyManagerService.Models.Settings;
 using MoneyManagerService.Data.Repositories;
+using Google.Apis.Auth;
+//using static Google.Apis.Auth.GoogleJsonWebSignature;
 
 namespace MoneyManagerService.Controllers
 {
@@ -96,41 +98,62 @@ namespace MoneyManagerService.Controllers
         }
 
         [HttpPost("login/google")]
-        public async Task<ActionResult<UserLoginDto>> LoginAsync([FromBody] LoginUserDto userForLoginDto)
+        public async Task<ActionResult<UserLoginDto>> LoginGoogleAsync([FromBody] LoginGoogleUserDto userForLoginDto)
         {
-            var user = await userRepository.GetByUsernameAsync(userForLoginDto.Username, user => user.RefreshToken!);
-
-            if (user == null)
+            try
             {
-                return Unauthorized("Invalid username or password.");
+                var validatedToken = await GoogleJsonWebSignature.ValidateAsync(userForLoginDto.IdToken, new GoogleJsonWebSignature.ValidationSettings { Audience = new List<string> { "504553588506-joctqv1rhpn8o06apgdb2904qfi6fn26.apps.googleusercontent.com" } });
+
+                var user = await userRepository.GetByUsernameAsync(validatedToken.Subject, user => user.RefreshToken!);
+
+                if (user == null)
+                {
+                    user = new User
+                    {
+                        UserName = validatedToken.Subject,
+                        Email = validatedToken.Email,
+                        EmailConfirmed = validatedToken.EmailVerified,
+                        FirstName = validatedToken.GivenName,
+                        LastName = validatedToken.FamilyName
+                    };
+
+                    var createResult = await userRepository.CreateUserWithAsync(user);
+
+                    if (!createResult.Succeeded)
+                    {
+                        return BadRequest(createResult.Errors.Select(e => e.Description).ToList());
+                    }
+                }
+
+                var token = GenerateJwtToken(user);
+                var refreshToken = GenerateRefreshToken();
+
+                user.RefreshToken = new RefreshToken
+                {
+                    Token = refreshToken,
+                    Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
+                };
+
+                await userRepository.SaveAllAsync();
+
+                var userToReturn = mapper.Map<UserDto>(user);
+
+                return Ok(new UserLoginDto
+                {
+                    Token = token,
+                    RefreshToken = refreshToken,
+                    User = userToReturn
+                });
+            }
+            catch (InvalidJwtException)
+            {
+                return Unauthorized("Invaid Id Token");
+            }
+            catch
+            {
+                return InternalServerError("Unable to login with Google.");
             }
 
-            var result = await userRepository.CheckPasswordAsync(user, userForLoginDto.Password);
-
-            if (!result)
-            {
-                return Unauthorized("Invalid username or password.");
-            }
-
-            var token = GenerateJwtToken(user);
-            var refreshToken = GenerateRefreshToken();
-
-            user.RefreshToken = new RefreshToken
-            {
-                Token = refreshToken,
-                Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
-            };
-
-            await userRepository.SaveAllAsync();
-
-            var userToReturn = mapper.Map<UserDto>(user);
-
-            return Ok(new UserLoginDto
-            {
-                Token = token,
-                RefreshToken = refreshToken,
-                User = userToReturn
-            });
         }
 
         [HttpPost("refreshToken")]
