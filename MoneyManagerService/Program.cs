@@ -32,11 +32,24 @@ namespace MoneyManagerService
                         {
                             var migrate = args.Contains(CommandLineOptions.migrateArgument, StringComparer.OrdinalIgnoreCase);
                             var clearData = args.Contains(CommandLineOptions.clearDataArgument, StringComparer.OrdinalIgnoreCase);
+                            var seedData = args.Contains(CommandLineOptions.seedDataArgument, StringComparer.OrdinalIgnoreCase);
+                            var dropDatabase = args.Contains(CommandLineOptions.dropArgument, StringComparer.OrdinalIgnoreCase);
 
                             var seeder = serviceProvider.GetRequiredService<Seeder>();
 
-                            logger.LogInformation($"Seeding database: Clear old data: {clearData} Apply Migrations: {migrate}");
-                            seeder.SeedDatabase(clearData, migrate);
+                            logger.LogInformation($"Seeding database:\nDrop database: {dropDatabase}\nApply Migrations: {migrate}\nClear old data: {clearData}\nSeed new data: {seedData}");
+                            logger.LogWarning("Are you sure you want to apply these actions to the database in that order? Only 'yes' will continue.");
+
+                            var answer = Console.ReadLine();
+
+                            if (answer == "yes")
+                            {
+                                seeder.SeedDatabase(seedData, clearData, migrate, dropDatabase);
+                            }
+                            else
+                            {
+                                logger.LogWarning("Aborting database seed process...");
+                            }
                         }
                         else
                         {

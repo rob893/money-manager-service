@@ -36,6 +36,7 @@ namespace MoneyManagerService.Core
                     opt.MapFrom(u => u.UserRoles.Select(ur => ur.Role.Name)));
             CreateMap<RegisterUserDto, User>();
             CreateMap<Role, RoleDto>();
+            CreateMap<LinkedAccount, LinkedAccountDto>();
             CreateMap<JsonPatchDocument<UpdateUserDto>, JsonPatchDocument<User>>();
             CreateMap<Operation<UpdateUserDto>, Operation<User>>();
         }

@@ -10,6 +10,7 @@ namespace MoneyManagerService.Data
         IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
         public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+        public DbSet<LinkedAccount> LinkedAccounts => Set<LinkedAccount>();
         public DbSet<TickerTimeSeries> TickerTimeSeries => Set<TickerTimeSeries>();
         public DbSet<Budget> Budgets => Set<Budget>();
         public DbSet<Expense> Expenses => Set<Expense>();
@@ -58,6 +59,12 @@ namespace MoneyManagerService.Data
             modelBuilder.Entity<Income>()
                .Property(income => income.IncomeType)
                .HasConversion<string>();
+
+            modelBuilder.Entity<LinkedAccount>(linkedAccount =>
+            {
+                linkedAccount.HasKey(account => new { account.Id, account.LinkedAccountType });
+                linkedAccount.Property(account => account.LinkedAccountType).HasConversion<string>();
+            });
         }
     }
 }

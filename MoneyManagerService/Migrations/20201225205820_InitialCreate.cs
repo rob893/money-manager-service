@@ -202,6 +202,25 @@ namespace MoneyManagerService.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LinkedAccounts",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255) CHARACTER SET utf8mb4", nullable: false),
+                    LinkedAccountType = table.Column<string>(type: "varchar(255) CHARACTER SET utf8mb4", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LinkedAccounts", x => new { x.Id, x.LinkedAccountType });
+                    table.ForeignKey(
+                        name: "FK_LinkedAccounts_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
                 {
@@ -341,6 +360,11 @@ namespace MoneyManagerService.Migrations
                 column: "BudgetId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_LinkedAccounts_UserId",
+                table: "LinkedAccounts",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TaxLiabilities_BudgetId",
                 table: "TaxLiabilities",
                 column: "BudgetId",
@@ -374,6 +398,9 @@ namespace MoneyManagerService.Migrations
 
             migrationBuilder.DropTable(
                 name: "Incomes");
+
+            migrationBuilder.DropTable(
+                name: "LinkedAccounts");
 
             migrationBuilder.DropTable(
                 name: "RefreshTokens");

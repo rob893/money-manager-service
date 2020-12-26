@@ -1,0 +1,260 @@
+[
+  {
+    "id": 1,
+    "userId": 3,
+    "name": "Main Budget",
+    "description": "My main budget",
+    "taxFilingStatus": "MarriedFilingJointly",
+    "taxLiability": {
+      "id": 1,
+      "budgetId": 1,
+      "federal": 0.0,
+      "fica": 0.0,
+      "state": 0.0
+    },
+    "incomes": [
+      {
+        "id": 1,
+        "budgetId": 1,
+        "incomeType": "W2",
+        "name": "MGM",
+        "description": "Robert's income",
+        "amount": 115000.0
+      },
+      {
+        "id": 2,
+        "budgetId": 1,
+        "incomeType": "W2",
+        "name": "Lockheed",
+        "description": "Celeste's income",
+        "amount": 79000.0
+      },
+      {
+        "id": 3,
+        "budgetId": 1,
+        "incomeType": "LongTermCapitalGains",
+        "name": "Robinhood Account",
+        "description": null,
+        "amount": 15000.0
+      }
+    ],
+    "expenses": [
+      {
+        "id": 1,
+        "budgetId": 1,
+        "name": "Housing",
+        "description": "Mortgage, house insurance, and property tax",
+        "amount": 1207.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 2,
+        "budgetId": 1,
+        "name": "Home security",
+        "description": "Brinks",
+        "amount": 50.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 3,
+        "budgetId": 1,
+        "name": "Phone",
+        "description": null,
+        "amount": 120.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 4,
+        "budgetId": 1,
+        "name": "Taxable Investments",
+        "description": "Robinhood account",
+        "amount": 500.0,
+        "frequency": "Weekly"
+      },
+      {
+        "id": 5,
+        "budgetId": 1,
+        "name": "WoW",
+        "description": null,
+        "amount": 15.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 6,
+        "budgetId": 1,
+        "name": "Car Insurance",
+        "description": null,
+        "amount": 262.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 7,
+        "budgetId": 1,
+        "name": "Cable and Internet",
+        "description": "Cox",
+        "amount": 137.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 8,
+        "budgetId": 1,
+        "name": "Netflix",
+        "description": null,
+        "amount": 9.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 9,
+        "budgetId": 1,
+        "name": "Hulu",
+        "description": null,
+        "amount": 7.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 10,
+        "budgetId": 1,
+        "name": "Disney+",
+        "description": null,
+        "amount": 7.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 11,
+        "budgetId": 1,
+        "name": "XM Radio",
+        "description": null,
+        "amount": 21.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 12,
+        "budgetId": 1,
+        "name": "Buddy's Meds",
+        "description": null,
+        "amount": 15.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 13,
+        "budgetId": 1,
+        "name": "Power Bill",
+        "description": null,
+        "amount": 150.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 14,
+        "budgetId": 1,
+        "name": "Natural Gas",
+        "description": null,
+        "amount": 35.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 15,
+        "budgetId": 1,
+        "name": "Water, sewer, and trash",
+        "description": null,
+        "amount": 80.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 16,
+        "budgetId": 1,
+        "name": "Gas (car)",
+        "description": null,
+        "amount": 100.0,
+        "frequency": "Monthly"
+      },
+      {
+        "id": 17,
+        "budgetId": 1,
+        "name": "Groceries",
+        "description": null,
+        "amount": 120.0,
+        "frequency": "Weekly"
+      },
+      {
+        "id": 18,
+        "budgetId": 1,
+        "name": "Amazon Prime",
+        "description": null,
+        "amount": 120.0,
+        "frequency": "Annually"
+      },
+      {
+        "id": 19,
+        "budgetId": 1,
+        "name": "Office 365",
+        "description": null,
+        "amount": 70.0,
+        "frequency": "Annually"
+      },
+      {
+        "id": 20,
+        "budgetId": 1,
+        "name": "Car Registration",
+        "description": "Both cars",
+        "amount": 700.0,
+        "frequency": "Annually"
+      },
+      {
+        "id": 21,
+        "budgetId": 1,
+        "name": "Web Server Hosting and Domain",
+        "description": "Digital ocean server and godaddy domain",
+        "amount": 75.0,
+        "frequency": "Annually"
+      },
+      {
+        "id": 22,
+        "budgetId": 1,
+        "name": "Ring",
+        "description": null,
+        "amount": 60.0,
+        "frequency": "Annually"
+      },
+      {
+        "id": 23,
+        "budgetId": 1,
+        "name": "Employee Benefits (Health, Vision, Dental, etc.)",
+        "description": null,
+        "amount": 3648.0,
+        "frequency": "Annually"
+      },
+      {
+        "id": 24,
+        "budgetId": 1,
+        "name": "401k Contributions",
+        "description": "Both Robert and Celeste",
+        "amount": 22780.0,
+        "frequency": "Annually"
+      },
+      {
+        "id": 25,
+        "budgetId": 1,
+        "name": "Federal Taxes",
+        "description": null,
+        "amount": 36239.0,
+        "frequency": "Annually"
+      },
+      {
+        "id": 26,
+        "budgetId": 1,
+        "name": "BiWeekly Test",
+        "description": null,
+        "amount": 1.0,
+        "frequency": "BiWeekly"
+      },
+      {
+        "id": 27,
+        "budgetId": 1,
+        "name": "Daily Test",
+        "description": null,
+        "amount": 1.0,
+        "frequency": "Daily"
+      }
+    ]
+  }
+]

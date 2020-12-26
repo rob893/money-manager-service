@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using MoneyManagerService.Entities;
 using Newtonsoft.Json;
 using System.Linq;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 
@@ -21,8 +22,13 @@ namespace MoneyManagerService.Data
             this.roleManager = roleManager;
         }
 
-        public void SeedDatabase(bool clearCurrentData = false, bool applyMigrations = false)
+        public void SeedDatabase(bool seedData, bool clearCurrentData, bool applyMigrations, bool dropDatabase)
         {
+            if (dropDatabase)
+            {
+                context.Database.EnsureDeleted();
+            }
+
             if (applyMigrations)
             {
                 context.Database.Migrate();
@@ -33,13 +39,19 @@ namespace MoneyManagerService.Data
                 ClearAllData();
             }
 
-            SeedRoles();
-            SeedUsers();
+            if (seedData)
+            {
+                SeedRoles();
+                SeedUsers();
+                SeedBudgets();
+            }
         }
 
         private void ClearAllData()
         {
             context.RefreshTokens.RemoveRange(context.RefreshTokens);
+            context.TickerTimeSeries.RemoveRange(context.TickerTimeSeries);
+            context.Budgets.RemoveRange(context.Budgets);
             context.Users.RemoveRange(context.Users);
             context.Roles.RemoveRange(context.Roles);
 
@@ -53,7 +65,7 @@ namespace MoneyManagerService.Data
                 return;
             }
 
-            string data = System.IO.File.ReadAllText("Data/SeedData/RoleSeedData.json");
+            string data = File.ReadAllText("Data/SeedData/RoleSeedData.json");
             var roles = JsonConvert.DeserializeObject<List<Role>>(data);
 
             foreach (var role in roles)
@@ -69,7 +81,7 @@ namespace MoneyManagerService.Data
                 return;
             }
 
-            string data = System.IO.File.ReadAllText("Data/SeedData/UserSeedData.json");
+            string data = File.ReadAllText("Data/SeedData/UserSeedData.json");
             List<User> users = JsonConvert.DeserializeObject<List<User>>(data);
 
             foreach (User user in users)
@@ -86,6 +98,22 @@ namespace MoneyManagerService.Data
                     userManager.AddToRoleAsync(user, "User").Wait();
                 }
             }
+        }
+
+        private void SeedBudgets()
+        {
+            if (context.Budgets.Any())
+            {
+                return;
+            }
+
+            string data = File.ReadAllText("Data/SeedData/BudgetSeedData.json");
+
+            var budgets = JsonConvert.DeserializeObject<List<Budget>>(data);
+
+            context.AddRange(budgets);
+
+            context.SaveChanges();
         }
     }
 }

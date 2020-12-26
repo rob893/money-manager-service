@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace MoneyManagerService.Models.DTOs
@@ -9,7 +8,7 @@ namespace MoneyManagerService.Models.DTOs
         public string UserName { get; init; } = default!;
 
         [Required]
-        [StringLength(10, MinimumLength = 4, ErrorMessage = "You must specify a password between 4 and 10 characters")]
+        [StringLength(256, MinimumLength = 6, ErrorMessage = "You must specify a password between 4 and 256 characters")]
         public string Password { get; init; } = default!;
 
         [Required]
@@ -22,13 +21,5 @@ namespace MoneyManagerService.Models.DTOs
 
         [Required]
         public string Email { get; init; } = default!;
-
-        public DateTimeOffset Created { get; init; }
-
-
-        public RegisterUserDto()
-        {
-            Created = DateTimeOffset.UtcNow;
-        }
     }
 }

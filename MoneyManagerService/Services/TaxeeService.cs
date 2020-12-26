@@ -50,6 +50,11 @@ namespace MoneyManagerService.Services
                 }
             });
 
+            if (content == null)
+            {
+                throw new NullReferenceException(nameof(content));
+            }
+
             return content;
         }
     }

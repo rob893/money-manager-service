@@ -17,5 +17,6 @@ namespace MoneyManagerService.Entities
         public RefreshToken? RefreshToken { get; set; }
         public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
         public List<Budget> Budgets { get; set; } = new List<Budget>();
+        public List<LinkedAccount> LinkedAccounts { get; set; } = new List<LinkedAccount>();
     }
 }

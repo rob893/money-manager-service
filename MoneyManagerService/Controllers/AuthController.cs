@@ -38,20 +38,97 @@ namespace MoneyManagerService.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> RegisterAsync([FromBody] RegisterUserDto userForRegisterDto)
+        public async Task<ActionResult<UserLoginDto>> RegisterAsync([FromBody] RegisterUserDto userForRegisterDto)
         {
-            var userToCreate = mapper.Map<User>(userForRegisterDto);
+            var user = mapper.Map<User>(userForRegisterDto);
 
-            var result = await userRepository.CreateUserWithPasswordAsync(userToCreate, userForRegisterDto.Password);
-
-            var userToReturn = mapper.Map<UserDto>(userToCreate);
+            var result = await userRepository.CreateUserWithPasswordAsync(user, userForRegisterDto.Password);
 
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors.Select(e => e.Description).ToList());
             }
 
-            return CreatedAtRoute("GetUserAsync", new { controller = "Users", id = userToCreate.Id }, userToReturn);
+            var token = GenerateJwtToken(user);
+            var refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = new RefreshToken
+            {
+                Token = refreshToken,
+                Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
+            };
+
+            await userRepository.SaveAllAsync();
+
+            var userToReturn = mapper.Map<UserDto>(user);
+
+            return CreatedAtRoute("GetUserAsync", new { controller = "Users", id = user.Id }, new UserLoginDto
+            {
+                Token = token,
+                RefreshToken = refreshToken,
+                User = userToReturn
+            });
+        }
+
+        [HttpPost("register/google")]
+        public async Task<ActionResult<UserLoginDto>> RegisterWithGoogleAccountAsync([FromBody] RegisterUserUsingGoolgleDto userForRegisterDto)
+        {
+            try
+            {
+                var validatedToken = await GoogleJsonWebSignature.ValidateAsync(userForRegisterDto.IdToken, new GoogleJsonWebSignature.ValidationSettings { Audience = new List<string> { "504553588506-joctqv1rhpn8o06apgdb2904qfi6fn26.apps.googleusercontent.com" } });
+
+                var user = new User
+                {
+                    UserName = userForRegisterDto.UserName,
+                    Email = validatedToken.Email,
+                    EmailConfirmed = validatedToken.EmailVerified,
+                    FirstName = validatedToken.GivenName,
+                    LastName = validatedToken.FamilyName,
+                    LinkedAccounts = new List<LinkedAccount>
+                    {
+                        new LinkedAccount
+                        {
+                            Id = validatedToken.Subject,
+                            LinkedAccountType = LinkedAccountType.Google
+                        }
+                    }
+                };
+
+                var createResult = await userRepository.CreateUserWithAsync(user);
+
+                if (!createResult.Succeeded)
+                {
+                    return BadRequest(createResult.Errors.Select(e => e.Description).ToList());
+                }
+
+                var token = GenerateJwtToken(user);
+                var refreshToken = GenerateRefreshToken();
+
+                user.RefreshToken = new RefreshToken
+                {
+                    Token = refreshToken,
+                    Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
+                };
+
+                await userRepository.SaveAllAsync();
+
+                var userToReturn = mapper.Map<UserDto>(user);
+
+                return CreatedAtRoute("GetUserAsync", new { controller = "Users", id = user.Id }, new UserLoginDto
+                {
+                    Token = token,
+                    RefreshToken = refreshToken,
+                    User = userToReturn
+                });
+            }
+            catch (InvalidJwtException)
+            {
+                return Unauthorized("Invaid Id Token.");
+            }
+            catch
+            {
+                return InternalServerError("Unable to register using Google account.");
+            }
         }
 
         /// <summary>
@@ -104,25 +181,11 @@ namespace MoneyManagerService.Controllers
             {
                 var validatedToken = await GoogleJsonWebSignature.ValidateAsync(userForLoginDto.IdToken, new GoogleJsonWebSignature.ValidationSettings { Audience = new List<string> { "504553588506-joctqv1rhpn8o06apgdb2904qfi6fn26.apps.googleusercontent.com" } });
 
-                var user = await userRepository.GetByUsernameAsync(validatedToken.Subject, user => user.RefreshToken!);
+                var user = await userRepository.GetByLinkedAccountAsync(validatedToken.Subject, LinkedAccountType.Google, user => user.RefreshToken!);
 
                 if (user == null)
                 {
-                    user = new User
-                    {
-                        UserName = validatedToken.Subject,
-                        Email = validatedToken.Email,
-                        EmailConfirmed = validatedToken.EmailVerified,
-                        FirstName = validatedToken.GivenName,
-                        LastName = validatedToken.FamilyName
-                    };
-
-                    var createResult = await userRepository.CreateUserWithAsync(user);
-
-                    if (!createResult.Succeeded)
-                    {
-                        return BadRequest(createResult.Errors.Select(e => e.Description).ToList());
-                    }
+                    return NotFound("No account found for this Google account.");
                 }
 
                 var token = GenerateJwtToken(user);
@@ -153,7 +216,6 @@ namespace MoneyManagerService.Controllers
             {
                 return InternalServerError("Unable to login with Google.");
             }
-
         }
 
         [HttpPost("refreshToken")]

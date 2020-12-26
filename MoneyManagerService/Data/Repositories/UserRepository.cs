@@ -49,6 +49,22 @@ namespace MoneyManagerService.Data.Repositories
             return query.OrderBy(e => e.Id).FirstOrDefaultAsync(user => user.UserName == username);
         }
 
+        public async Task<User?> GetByLinkedAccountAsync(string id, LinkedAccountType accountType, params Expression<Func<User, object>>[] includes)
+        {
+            var linkedAccount = await context.LinkedAccounts.FirstOrDefaultAsync(account => account.Id == id && account.LinkedAccountType == accountType);
+
+            if (linkedAccount == null)
+            {
+                return null;
+            }
+
+            IQueryable<User> query = context.Users;
+            query = AddIncludes(query);
+            query = includes.Aggregate(query, (current, includeProperty) => current.Include(includeProperty));
+
+            return await query.OrderBy(e => e.Id).FirstOrDefaultAsync(user => user.Id == linkedAccount.UserId);
+        }
+
         public Task<User> GetByUsernameAsync(string username, params Expression<Func<User, object>>[] includes)
         {
             IQueryable<User> query = context.Users;
@@ -80,7 +96,10 @@ namespace MoneyManagerService.Data.Repositories
 
         protected override IQueryable<User> AddIncludes(IQueryable<User> query)
         {
-            return query.Include(user => user.UserRoles).ThenInclude(userRole => userRole.Role);
+            return query
+                .Include(user => user.UserRoles)
+                .ThenInclude(userRole => userRole.Role)
+                .Include(user => user.LinkedAccounts);
         }
     }
 }

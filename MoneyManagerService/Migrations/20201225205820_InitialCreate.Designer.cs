@@ -9,7 +9,7 @@ using MoneyManagerService.Data;
 namespace MoneyManagerService.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20201130160807_InitialCreate")]
+    [Migration("20201225205820_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -17,7 +17,7 @@ namespace MoneyManagerService.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 64)
-                .HasAnnotation("ProductVersion", "5.0.0");
+                .HasAnnotation("ProductVersion", "5.0.1");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
@@ -188,6 +188,24 @@ namespace MoneyManagerService.Migrations
                     b.HasIndex("BudgetId");
 
                     b.ToTable("Incomes");
+                });
+
+            modelBuilder.Entity("MoneyManagerService.Entities.LinkedAccount", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
+                    b.Property<string>("LinkedAccountType")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id", "LinkedAccountType");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("LinkedAccounts");
                 });
 
             modelBuilder.Entity("MoneyManagerService.Entities.RefreshToken", b =>
@@ -464,6 +482,17 @@ namespace MoneyManagerService.Migrations
                     b.Navigation("Budget");
                 });
 
+            modelBuilder.Entity("MoneyManagerService.Entities.LinkedAccount", b =>
+                {
+                    b.HasOne("MoneyManagerService.Entities.User", "User")
+                        .WithMany("LinkedAccounts")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("MoneyManagerService.Entities.RefreshToken", b =>
                 {
                     b.HasOne("MoneyManagerService.Entities.User", "User")
@@ -523,6 +552,8 @@ namespace MoneyManagerService.Migrations
             modelBuilder.Entity("MoneyManagerService.Entities.User", b =>
                 {
                     b.Navigation("Budgets");
+
+                    b.Navigation("LinkedAccounts");
 
                     b.Navigation("RefreshToken");
 

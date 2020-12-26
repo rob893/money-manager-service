@@ -56,6 +56,32 @@ namespace MoneyManagerService.Controllers
             return Ok(userToReturn);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteUserAsync(int id)
+        {
+            var user = await userRepository.GetByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound($"No User with Id {id} found.");
+            }
+
+            if (!IsUserAuthorizedForResource(user.Id))
+            {
+                return Unauthorized("You can only delete your own user.");
+            }
+
+            userRepository.Delete(user);
+            var saveResults = await userRepository.SaveAllAsync();
+
+            if (!saveResults)
+            {
+                return BadRequest("Failed to delete the user.");
+            }
+
+            return NoContent();
+        }
+
         [HttpGet("{userId}/budgets")]
         public async Task<ActionResult<CursorPaginatedResponse<BudgetDto>>> GetBudgetsForUserAsync([FromRoute] int userId, [FromQuery] CursorPaginationParameters searchParams)
         {

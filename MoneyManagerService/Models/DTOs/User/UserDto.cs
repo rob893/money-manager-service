@@ -13,5 +13,6 @@ namespace MoneyManagerService.Models.DTOs
         public string Email { get; init; } = default!;
         public DateTimeOffset Created { get; init; }
         public IEnumerable<string> Roles { get; init; } = new List<string>();
+        public IEnumerable<LinkedAccountDto> LinkedAccounts { get; init; } = new List<LinkedAccountDto>();
     }
 }
