@@ -6,5 +6,7 @@ namespace MoneyManagerService.Models.DTOs
     {
         [Required]
         public string IdToken { get; init; } = default!;
+        [Required]
+        public string DeviceId { get; init; } = default!;
     }
 }

@@ -14,7 +14,7 @@ namespace MoneyManagerService.Entities
         [MaxLength(255)]
         public string LastName { get; set; } = default!;
         public DateTimeOffset Created { get; set; }
-        public RefreshToken? RefreshToken { get; set; }
+        public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public List<UserRole> UserRoles { get; set; } = new List<UserRole>();
         public List<Budget> Budgets { get; set; } = new List<Budget>();
         public List<LinkedAccount> LinkedAccounts { get; set; } = new List<LinkedAccount>();

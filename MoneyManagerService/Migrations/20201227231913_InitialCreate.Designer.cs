@@ -9,7 +9,7 @@ using MoneyManagerService.Data;
 namespace MoneyManagerService.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20201225205820_InitialCreate")]
+    [Migration("20201227231913_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -213,6 +213,9 @@ namespace MoneyManagerService.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<string>("DeviceId")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
                     b.Property<DateTimeOffset>("Expiration")
                         .HasColumnType("datetime(6)");
 
@@ -221,7 +224,7 @@ namespace MoneyManagerService.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
 
-                    b.HasKey("UserId");
+                    b.HasKey("UserId", "DeviceId");
 
                     b.ToTable("RefreshTokens");
                 });
@@ -496,8 +499,8 @@ namespace MoneyManagerService.Migrations
             modelBuilder.Entity("MoneyManagerService.Entities.RefreshToken", b =>
                 {
                     b.HasOne("MoneyManagerService.Entities.User", "User")
-                        .WithOne("RefreshToken")
-                        .HasForeignKey("MoneyManagerService.Entities.RefreshToken", "UserId")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -555,7 +558,7 @@ namespace MoneyManagerService.Migrations
 
                     b.Navigation("LinkedAccounts");
 
-                    b.Navigation("RefreshToken");
+                    b.Navigation("RefreshTokens");
 
                     b.Navigation("UserRoles");
                 });

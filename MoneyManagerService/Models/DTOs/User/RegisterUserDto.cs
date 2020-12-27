@@ -21,5 +21,8 @@ namespace MoneyManagerService.Models.DTOs
 
         [Required]
         public string Email { get; init; } = default!;
+
+        [Required]
+        public string DeviceId { get; init; } = default!;
     }
 }

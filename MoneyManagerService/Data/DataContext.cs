@@ -40,7 +40,7 @@ namespace MoneyManagerService.Data
 
             modelBuilder.Entity<RefreshToken>(rToken =>
             {
-                rToken.HasKey(k => k.UserId);
+                rToken.HasKey(k => new { k.UserId, k.DeviceId });
             });
 
             modelBuilder.Entity<TickerTimeSeries>(tickerTimeSeries =>

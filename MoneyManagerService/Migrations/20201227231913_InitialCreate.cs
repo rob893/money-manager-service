@@ -224,13 +224,14 @@ namespace MoneyManagerService.Migrations
                 name: "RefreshTokens",
                 columns: table => new
                 {
+                    DeviceId = table.Column<string>(type: "varchar(255) CHARACTER SET utf8mb4", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Token = table.Column<string>(type: "varchar(255) CHARACTER SET utf8mb4", maxLength: 255, nullable: false),
                     Expiration = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RefreshTokens", x => x.UserId);
+                    table.PrimaryKey("PK_RefreshTokens", x => new { x.UserId, x.DeviceId });
                     table.ForeignKey(
                         name: "FK_RefreshTokens_AspNetUsers_UserId",
                         column: x => x.UserId,

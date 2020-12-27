@@ -8,5 +8,7 @@ namespace MoneyManagerService.Models.DTOs
         public string Username { get; init; } = default!;
         [Required]
         public string Password { get; init; } = default!;
+        [Required]
+        public string DeviceId { get; init; } = default!;
     }
 }

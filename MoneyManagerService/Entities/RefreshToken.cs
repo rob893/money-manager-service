@@ -5,6 +5,7 @@ namespace MoneyManagerService.Entities
 {
     public class RefreshToken : IOwnedByUser<int>
     {
+        public string DeviceId { get; set; } = default!;
         public int UserId { get; set; }
         public User User { get; set; } = default!;
         [Required]

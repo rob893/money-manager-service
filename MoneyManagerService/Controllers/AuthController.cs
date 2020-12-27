@@ -52,11 +52,12 @@ namespace MoneyManagerService.Controllers
             var token = GenerateJwtToken(user);
             var refreshToken = GenerateRefreshToken();
 
-            user.RefreshToken = new RefreshToken
+            user.RefreshTokens.Add(new RefreshToken
             {
                 Token = refreshToken,
-                Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
-            };
+                Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes),
+                DeviceId = userForRegisterDto.DeviceId
+            });
 
             await userRepository.SaveAllAsync();
 
@@ -104,11 +105,12 @@ namespace MoneyManagerService.Controllers
                 var token = GenerateJwtToken(user);
                 var refreshToken = GenerateRefreshToken();
 
-                user.RefreshToken = new RefreshToken
+                user.RefreshTokens.Add(new RefreshToken
                 {
                     Token = refreshToken,
-                    Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
-                };
+                    Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes),
+                    DeviceId = userForRegisterDto.DeviceId
+                });
 
                 await userRepository.SaveAllAsync();
 
@@ -139,7 +141,7 @@ namespace MoneyManagerService.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserLoginDto>> LoginAsync([FromBody] LoginUserDto userForLoginDto)
         {
-            var user = await userRepository.GetByUsernameAsync(userForLoginDto.Username, user => user.RefreshToken!);
+            var user = await userRepository.GetByUsernameAsync(userForLoginDto.Username, user => user.RefreshTokens);
 
             if (user == null)
             {
@@ -153,14 +155,17 @@ namespace MoneyManagerService.Controllers
                 return Unauthorized("Invalid username or password.");
             }
 
+            user.RefreshTokens.RemoveAll(token => token.Expiration <= DateTime.UtcNow || token.DeviceId == userForLoginDto.DeviceId);
+
             var token = GenerateJwtToken(user);
             var refreshToken = GenerateRefreshToken();
 
-            user.RefreshToken = new RefreshToken
+            user.RefreshTokens.Add(new RefreshToken
             {
                 Token = refreshToken,
-                Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
-            };
+                Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes),
+                DeviceId = userForLoginDto.DeviceId
+            });
 
             await userRepository.SaveAllAsync();
 
@@ -181,21 +186,24 @@ namespace MoneyManagerService.Controllers
             {
                 var validatedToken = await GoogleJsonWebSignature.ValidateAsync(userForLoginDto.IdToken, new GoogleJsonWebSignature.ValidationSettings { Audience = new List<string> { "504553588506-joctqv1rhpn8o06apgdb2904qfi6fn26.apps.googleusercontent.com" } });
 
-                var user = await userRepository.GetByLinkedAccountAsync(validatedToken.Subject, LinkedAccountType.Google, user => user.RefreshToken!);
+                var user = await userRepository.GetByLinkedAccountAsync(validatedToken.Subject, LinkedAccountType.Google, user => user.RefreshTokens);
 
                 if (user == null)
                 {
                     return NotFound("No account found for this Google account.");
                 }
 
+                user.RefreshTokens.RemoveAll(token => token.Expiration <= DateTime.UtcNow || token.DeviceId == userForLoginDto.DeviceId);
+
                 var token = GenerateJwtToken(user);
                 var refreshToken = GenerateRefreshToken();
 
-                user.RefreshToken = new RefreshToken
+                user.RefreshTokens.Add(new RefreshToken
                 {
                     Token = refreshToken,
-                    Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
-                };
+                    Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes),
+                    DeviceId = userForLoginDto.DeviceId
+                });
 
                 await userRepository.SaveAllAsync();
 
@@ -254,26 +262,34 @@ namespace MoneyManagerService.Controllers
                 return Unauthorized("Invalid token.");
             }
 
-            var user = await userRepository.GetByIdAsync(userId, user => user.RefreshToken!);
+            var user = await userRepository.GetByIdAsync(userId, user => user.RefreshTokens);
 
             if (user == null)
             {
                 return Unauthorized("Invalid token.");
             }
 
-            if (user.RefreshToken == null || user.RefreshToken.Token != refreshTokenDto.RefreshToken || DateTimeOffset.UtcNow > user.RefreshToken.Expiration)
+            user.RefreshTokens.RemoveAll(token => token.Expiration <= DateTime.UtcNow);
+
+            var currentRefreshToken = user.RefreshTokens.FirstOrDefault(token => token.DeviceId == refreshTokenDto.DeviceId);
+
+            if (currentRefreshToken == null)
             {
+                await userRepository.SaveAllAsync();
                 return Unauthorized("Invalid token.");
             }
+
+            user.RefreshTokens.Remove(currentRefreshToken);
 
             var token = GenerateJwtToken(user);
             var refreshToken = GenerateRefreshToken();
 
-            user.RefreshToken = new RefreshToken
+            user.RefreshTokens.Add(new RefreshToken
             {
                 Token = refreshToken,
-                Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes)
-            };
+                Expiration = DateTimeOffset.UtcNow.AddMinutes(authSettings.RefreshTokenExpirationTimeInMinutes),
+                DeviceId = refreshTokenDto.DeviceId
+            });
 
             await userRepository.SaveAllAsync();
 
