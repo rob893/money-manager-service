@@ -35,7 +35,7 @@ namespace MoneyManagerService.ApplicationStartup
                 .AddRepositoryServices()
                 .AddAlphaVantageServices(Configuration)
                 .AddTaxeeServices(Configuration)
-                .AddHangfireServices(Configuration)
+                // .AddHangfireServices(Configuration)
                 .AddSwaggerServices(Configuration)
                 .AddAutoMapper(typeof(Startup))
                 .AddHealthCheckServices()
@@ -66,7 +66,7 @@ namespace MoneyManagerService.ApplicationStartup
                 .UseAuthentication()
                 .UseAuthorization()
                 .UseAndConfigureSwagger(env)
-                .UseAndConfigureHangfire(Configuration)
+                // .UseAndConfigureHangfire(Configuration)
                 .UseEndpoints(endpoints =>
                 {
                     endpoints.MapHealthChecks("/health", new HealthCheckOptions()
