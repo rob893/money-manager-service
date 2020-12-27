@@ -52,6 +52,7 @@ namespace MoneyManagerService.ApplicationStartup
 
             app.UseExceptionHandler(builder => builder.UseMiddleware<GlobalExceptionHandlerMiddleware>())
                 .UseHsts()
+                .UseHttpsRedirection()
                 .UseForwardedHeaders(new ForwardedHeadersOptions
                 {
                     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
