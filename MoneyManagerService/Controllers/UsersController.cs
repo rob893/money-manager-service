@@ -13,6 +13,7 @@ using MoneyManagerService.Constants;
 using Microsoft.AspNetCore.JsonPatch;
 using MoneyManagerService.Extensions;
 using MoneyManagerService.Models.DTOs.Budget;
+using MoneyManagerService.Models.DTOs.Tag;
 
 namespace MoneyManagerService.Controllers
 {
@@ -22,13 +23,15 @@ namespace MoneyManagerService.Controllers
     {
         private readonly UserRepository userRepository;
         private readonly BudgetRepository budgetRepository;
+        private readonly TagRepository tagRepository;
         private readonly IMapper mapper;
 
 
-        public UsersController(UserRepository userRepository, BudgetRepository budgetRepository, IMapper mapper)
+        public UsersController(UserRepository userRepository, BudgetRepository budgetRepository, TagRepository tagRepository, IMapper mapper)
         {
             this.userRepository = userRepository;
             this.budgetRepository = budgetRepository;
+            this.tagRepository = tagRepository;
             this.mapper = mapper;
         }
 
@@ -228,6 +231,63 @@ namespace MoneyManagerService.Controllers
             var userToReturn = mapper.Map<UserDto>(user);
 
             return Ok(userToReturn);
+        }
+
+        [HttpGet("{userId}/tags")]
+        public async Task<ActionResult<CursorPaginatedResponse<TagDto>>> GetTagsForUserAsync([FromRoute] int userId, [FromQuery] TagQueryParameters searchParams)
+        {
+            if (searchParams == null)
+            {
+                return this.BadRequest();
+            }
+
+            if (!this.User.TryGetUserId(out var currUserId))
+            {
+                return this.Unauthorized();
+            }
+
+            if (userId != currUserId)
+            {
+                return this.Forbid();
+            }
+
+            var tags = await this.tagRepository.SearchTagsForUserAsync(userId, searchParams);
+
+            var paginatedResponse = CursorPaginatedResponse<TagDto>.CreateFrom(tags, mapper.Map<IEnumerable<TagDto>>, searchParams);
+
+            return this.Ok(paginatedResponse);
+        }
+
+        [HttpDelete("{userId}/tags/{tagId}")]
+        public async Task<ActionResult> DeleteTagForUserAsync([FromRoute] int userId, [FromRoute] int tagId)
+        {
+            if (!this.User.TryGetUserId(out var currUserId))
+            {
+                return this.Unauthorized();
+            }
+
+            if (userId != currUserId)
+            {
+                return this.Forbid();
+            }
+
+            var tag = await this.tagRepository.GetByIdAsync(tagId);
+
+            if (tag == null)
+            {
+                return this.NotFound();
+            }
+
+            if (tag.UserId != userId)
+            {
+                return this.Forbid();
+            }
+
+            this.tagRepository.Delete(tag);
+
+            await this.tagRepository.SaveAllAsync();
+
+            return this.NoContent();
         }
     }
 }

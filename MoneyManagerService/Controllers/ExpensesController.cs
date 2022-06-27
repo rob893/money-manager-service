@@ -192,11 +192,39 @@ namespace MoneyManagerService.Controllers
 
             var currentTags = await this.tagRepository.GetTagsForUserAsync(userId.Value);
 
-            var existingTagsToAdd = currentTags.Where(currentTag => tagsToAdd.Contains(currentTag.Name) && !expense.Tags.Contains(currentTag));
-            var tagsToCreate = tagsToAdd.Where(tag => !currentTags.Select(t => t.Name).Contains(tag)).Select(tag => new Tag { UserId = userId.Value, Name = tag });
+            var existingTagsToAdd = currentTags
+                .Where(currentTag => tagsToAdd.Contains(currentTag.Name) && !expense.Tags.Contains(currentTag))
+                .DistinctBy(t => t.Name);
+            var tagsToCreate = tagsToAdd
+                .Where(tag => !currentTags.Select(t => t.Name).Contains(tag)).Select(tag => new Tag { UserId = userId.Value, Name = tag })
+                .DistinctBy(t => t.Name);
 
             expense.Tags.AddRange(existingTagsToAdd);
             expense.Tags.AddRange(tagsToCreate);
+
+            await this.expenseRepository.SaveAllAsync();
+
+            var mapped = this.mapper.Map<ExpenseDto>(expense);
+
+            return this.Ok(mapped);
+        }
+
+        [HttpDelete("{expenseId}/tags/{tagId}")]
+        public async Task<ActionResult<ExpenseDto>> RemoveTagFromExpenseAsync([FromRoute] int expenseId, [FromRoute] int tagId)
+        {
+            var expense = await this.expenseRepository.GetByIdAsync(expenseId, e => e.Budget);
+
+            if (expense == null)
+            {
+                return this.NotFound();
+            }
+
+            if (!this.IsUserAuthorizedForResource(expense.Budget))
+            {
+                return this.Forbid();
+            }
+
+            expense.Tags.RemoveAll(tag => tag.Id == tagId);
 
             await this.expenseRepository.SaveAllAsync();
 

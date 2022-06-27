@@ -14,7 +14,8 @@ namespace MoneyManagerService.Data.Repositories
         public Task<CursorPagedList<Expense, int>> GetExpensesForBudgetAsync(int budgetId, CursorPaginationParameters searchParams)
         {
             IQueryable<Expense> query = context.Expenses
-                .Where(expense => expense.BudgetId == budgetId);
+                .Where(expense => expense.BudgetId == budgetId)
+                .Include(ex => ex.Tags);
 
             return CursorPagedList<Expense, int>.CreateAsync(query, searchParams);
         }
