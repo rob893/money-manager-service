@@ -11,6 +11,11 @@ namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
     {
         public static IServiceCollection AddAlphaVantageServices(this IServiceCollection services, IConfiguration config)
         {
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+
             services.Configure<AlphaVantageSettings>(config.GetSection("AlphaVantage"));
             services.AddHttpClient<AlphaVantageService>()
                 .AddTransientHttpErrorPolicy(p =>

@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -9,21 +10,27 @@ namespace MoneyManagerService.Data
         IdentityUserClaim<int>, UserRole, IdentityUserLogin<int>,
         IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
-        public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
-        public DbSet<LinkedAccount> LinkedAccounts => Set<LinkedAccount>();
-        public DbSet<TickerTimeSeries> TickerTimeSeries => Set<TickerTimeSeries>();
-        public DbSet<Budget> Budgets => Set<Budget>();
-        public DbSet<Expense> Expenses => Set<Expense>();
-        public DbSet<Income> Incomes => Set<Income>();
-        public DbSet<TaxLiability> TaxLiabilities => Set<TaxLiability>();
+        public DbSet<RefreshToken> RefreshTokens => this.Set<RefreshToken>();
+        public DbSet<LinkedAccount> LinkedAccounts => this.Set<LinkedAccount>();
+        public DbSet<TickerTimeSeries> TickerTimeSeries => this.Set<TickerTimeSeries>();
+        public DbSet<Budget> Budgets => this.Set<Budget>();
+        public DbSet<Expense> Expenses => this.Set<Expense>();
+        public DbSet<Income> Incomes => this.Set<Income>();
+        public DbSet<TaxLiability> TaxLiabilities => this.Set<TaxLiability>();
+        public DbSet<Tag> Tags => this.Set<Tag>();
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
 
-            modelBuilder.Entity<UserRole>(userRole =>
+            base.OnModelCreating(builder);
+
+            builder.Entity<UserRole>(userRole =>
             {
                 userRole.HasKey(ur => new { ur.UserId, ur.RoleId });
 
@@ -38,29 +45,29 @@ namespace MoneyManagerService.Data
                     .IsRequired();
             });
 
-            modelBuilder.Entity<RefreshToken>(rToken =>
+            builder.Entity<RefreshToken>(rToken =>
             {
                 rToken.HasKey(k => new { k.UserId, k.DeviceId });
             });
 
-            modelBuilder.Entity<TickerTimeSeries>(tickerTimeSeries =>
+            builder.Entity<TickerTimeSeries>(tickerTimeSeries =>
             {
                 tickerTimeSeries.HasIndex(tss => new { tss.Ticker, tss.Date });
             });
 
-            modelBuilder.Entity<Expense>()
+            builder.Entity<Expense>()
                 .Property(expense => expense.Frequency)
                 .HasConversion<string>();
 
-            modelBuilder.Entity<Budget>()
+            builder.Entity<Budget>()
                 .Property(budget => budget.TaxFilingStatus)
                 .HasConversion<string>();
 
-            modelBuilder.Entity<Income>()
+            builder.Entity<Income>()
                .Property(income => income.IncomeType)
                .HasConversion<string>();
 
-            modelBuilder.Entity<LinkedAccount>(linkedAccount =>
+            builder.Entity<LinkedAccount>(linkedAccount =>
             {
                 linkedAccount.HasKey(account => new { account.Id, account.LinkedAccountType });
                 linkedAccount.Property(account => account.LinkedAccountType).HasConversion<string>();

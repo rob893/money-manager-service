@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using MoneyManagerService.Entities;
+using MoneyManagerService.Models.DTOs.Tag;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -13,5 +15,6 @@ namespace MoneyManagerService.Models.DTOs.Expense
         public double Amount { get; init; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Frequency Frequency { get; init; }
+        public List<TagDto> Tags { get; init; } = new();
     }
 }

@@ -13,7 +13,7 @@ using MoneyManagerService.Data;
 
 namespace MoneyManagerService
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {
@@ -26,7 +26,7 @@ namespace MoneyManagerService
                     {
                         var scope = host.Services.CreateScope();
                         var serviceProvider = scope.ServiceProvider;
-                        var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+                        var logger = serviceProvider.GetRequiredService<ILogger<Startup>>();
 
                         if (o.Password != null && o.Password == GetSeederPasswordFromConfiguration())
                         {

@@ -11,6 +11,8 @@ using MoneyManagerService.Constants;
 using MoneyManagerService.Models.Responses;
 using MoneyManagerService.Models.QueryParameters;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MoneyManagerService.Controllers
 {
@@ -20,12 +22,14 @@ namespace MoneyManagerService.Controllers
     {
         private readonly ExpenseRepository expenseRepository;
         private readonly BudgetRepository budgetRepository;
+        private readonly TagRepository tagRepository;
         private readonly IMapper mapper;
 
-        public ExpensesController(ExpenseRepository expenseRepository, BudgetRepository budgetRepository, IMapper mapper)
+        public ExpensesController(ExpenseRepository expenseRepository, BudgetRepository budgetRepository, TagRepository tagRepository, IMapper mapper)
         {
             this.expenseRepository = expenseRepository;
             this.budgetRepository = budgetRepository;
+            this.tagRepository = tagRepository;
             this.mapper = mapper;
         }
 
@@ -33,6 +37,11 @@ namespace MoneyManagerService.Controllers
         [HttpGet]
         public async Task<ActionResult<CursorPaginatedResponse<ExpenseDto>>> GetExpensesAsync([FromQuery] CursorPaginationParameters searchParams)
         {
+            if (searchParams == null)
+            {
+                return this.BadRequest();
+            }
+
             var expenses = await expenseRepository.SearchAsync(searchParams);
             var paginatedResponse = CursorPaginatedResponse<ExpenseDto>.CreateFrom(expenses, mapper.Map<IEnumerable<ExpenseDto>>, searchParams.IncludeNodes, searchParams.IncludeEdges);
 
@@ -62,21 +71,21 @@ namespace MoneyManagerService.Controllers
         [HttpPost]
         public async Task<ActionResult<ExpenseDto>> CreateExpenseAsync([FromBody] CreateExpenseDto expenseForCreateDto)
         {
-            if (expenseForCreateDto.BudgetId == null)
+            if (expenseForCreateDto == null || expenseForCreateDto.BudgetId == null)
             {
-                return BadRequest("BudgetId is required.");
+                return this.BadRequest("BudgetId is required.");
             }
 
             var budget = await budgetRepository.GetByIdAsync(expenseForCreateDto.BudgetId.Value);
 
             if (budget == null)
             {
-                return NotFound($"No budget with id {expenseForCreateDto.BudgetId.Value} found");
+                return this.NotFound($"No budget with id {expenseForCreateDto.BudgetId.Value} found");
             }
 
-            if (!IsUserAuthorizedForResource(budget))
+            if (!this.IsUserAuthorizedForResource(budget))
             {
-                return Unauthorized($"You are not authorized to access budget with id {expenseForCreateDto.BudgetId.Value}");
+                return this.Unauthorized($"You are not authorized to access budget with id {expenseForCreateDto.BudgetId.Value}");
             }
 
             var newExpense = mapper.Map<Expense>(expenseForCreateDto);
@@ -154,6 +163,46 @@ namespace MoneyManagerService.Controllers
             var expenseToReturn = mapper.Map<ExpenseDto>(expense);
 
             return Ok(expenseToReturn);
+        }
+
+        [HttpPost("{id}/tags")]
+        public async Task<ActionResult<ExpenseDto>> AddTagsToExpenseAsync([FromRoute] int id, [FromBody] List<string> tagsToAdd)
+        {
+            if (tagsToAdd.IsNullOrEmpty())
+            {
+                return this.BadRequest("At least one tag must be in the request.");
+            }
+
+            var expense = await this.expenseRepository.GetByIdAsync(id, exp => exp.Budget);
+
+            if (expense == null)
+            {
+                return this.NotFound();
+            }
+
+            if (!this.IsUserAuthorizedForResource(expense.Budget))
+            {
+                return this.Forbid("You can only access your own expenses.");
+            }
+
+            if (!this.User.TryGetUserId(out var userId))
+            {
+                return this.Unauthorized();
+            }
+
+            var currentTags = await this.tagRepository.GetTagsForUserAsync(userId.Value);
+
+            var existingTagsToAdd = currentTags.Where(currentTag => tagsToAdd.Contains(currentTag.Name) && !expense.Tags.Contains(currentTag));
+            var tagsToCreate = tagsToAdd.Where(tag => !currentTags.Select(t => t.Name).Contains(tag)).Select(tag => new Tag { UserId = userId.Value, Name = tag });
+
+            expense.Tags.AddRange(existingTagsToAdd);
+            expense.Tags.AddRange(tagsToCreate);
+
+            await this.expenseRepository.SaveAllAsync();
+
+            var mapped = this.mapper.Map<ExpenseDto>(expense);
+
+            return this.Ok(mapped);
         }
     }
 }

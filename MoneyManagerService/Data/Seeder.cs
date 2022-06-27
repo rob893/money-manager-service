@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using System.Globalization;
 
 namespace MoneyManagerService.Data
 {
@@ -60,60 +61,75 @@ namespace MoneyManagerService.Data
 
         private void SeedRoles()
         {
-            if (context.Roles.Any())
+            if (this.context.Roles.Any())
             {
                 return;
             }
 
-            string data = File.ReadAllText("Data/SeedData/RoleSeedData.json");
+            var data = File.ReadAllText("Data/SeedData/RoleSeedData.json");
             var roles = JsonConvert.DeserializeObject<List<Role>>(data);
+
+            if (roles == null)
+            {
+                return;
+            }
 
             foreach (var role in roles)
             {
-                roleManager.CreateAsync(role).Wait();
+                this.roleManager.CreateAsync(role).Wait();
             }
         }
 
         private void SeedUsers()
         {
-            if (userManager.Users.Any())
+            if (this.userManager.Users.Any())
             {
                 return;
             }
 
-            string data = File.ReadAllText("Data/SeedData/UserSeedData.json");
-            List<User> users = JsonConvert.DeserializeObject<List<User>>(data);
+            var data = File.ReadAllText("Data/SeedData/UserSeedData.json");
+            var users = JsonConvert.DeserializeObject<List<User>>(data);
 
-            foreach (User user in users)
+            if (users == null)
             {
-                userManager.CreateAsync(user, "password").Wait();
+                return;
+            }
 
-                if (user.UserName.ToUpper() == "ADMIN")
+            foreach (var user in users)
+            {
+                this.userManager.CreateAsync(user, "password").Wait();
+
+                if (user.UserName.ToUpper(CultureInfo.CurrentCulture) == "ADMIN")
                 {
-                    userManager.AddToRoleAsync(user, "Admin").Wait();
-                    userManager.AddToRoleAsync(user, "User").Wait();
+                    this.userManager.AddToRoleAsync(user, "Admin").Wait();
+                    this.userManager.AddToRoleAsync(user, "User").Wait();
                 }
                 else
                 {
-                    userManager.AddToRoleAsync(user, "User").Wait();
+                    this.userManager.AddToRoleAsync(user, "User").Wait();
                 }
             }
         }
 
         private void SeedBudgets()
         {
-            if (context.Budgets.Any())
+            if (this.context.Budgets.Any())
             {
                 return;
             }
 
-            string data = File.ReadAllText("Data/SeedData/BudgetSeedData.json");
+            var data = File.ReadAllText("Data/SeedData/BudgetSeedData.json");
 
             var budgets = JsonConvert.DeserializeObject<List<Budget>>(data);
 
-            context.AddRange(budgets);
+            if (budgets == null)
+            {
+                return;
+            }
 
-            context.SaveChanges();
+            this.context.AddRange(budgets);
+
+            this.context.SaveChanges();
         }
     }
 }

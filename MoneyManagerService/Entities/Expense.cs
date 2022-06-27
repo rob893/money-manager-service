@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -13,5 +14,6 @@ namespace MoneyManagerService.Entities
         public double Amount { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public Frequency Frequency { get; set; }
+        public List<Tag> Tags { get; set; } = new();
     }
 }

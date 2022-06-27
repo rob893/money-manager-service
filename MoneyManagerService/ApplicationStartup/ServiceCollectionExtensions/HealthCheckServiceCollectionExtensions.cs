@@ -1,4 +1,3 @@
-using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MoneyManagerService.Data;
@@ -14,14 +13,6 @@ namespace MoneyManagerService.ApplicationStartup.ServiceCollectionExtensions
                     name: "Database",
                     failureStatus: HealthStatus.Unhealthy,
                     tags: new[] { "db" });
-            // .AddHangfire(
-            //     options =>
-            //     {
-            //         options.MinimumAvailableServers = 1;
-            //     },
-            //     name: "Hangfire",
-            //     failureStatus: HealthStatus.Unhealthy,
-            //     tags: new[] { "hangfire" });
 
             return services;
         }

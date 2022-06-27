@@ -7,6 +7,7 @@ using MoneyManagerService.Models.DTOs;
 using MoneyManagerService.Models.DTOs.Budget;
 using MoneyManagerService.Models.DTOs.Expense;
 using MoneyManagerService.Models.DTOs.Income;
+using MoneyManagerService.Models.DTOs.Tag;
 using MoneyManagerService.Models.DTOs.TaxLiability;
 using MoneyManagerService.Models.QueryParameters;
 
@@ -22,6 +23,7 @@ namespace MoneyManagerService.Core
             CreateExpenseMaps();
             CreateIncomeMaps();
             CreateTaxLiabilityMaps();
+            this.CreateTagMaps();
         }
 
         private void CreateCursorPaginationMaps()
@@ -70,6 +72,11 @@ namespace MoneyManagerService.Core
         private void CreateTaxLiabilityMaps()
         {
             CreateMap<TaxLiability, TaxLiabilityDto>();
+        }
+
+        private void CreateTagMaps()
+        {
+            this.CreateMap<Tag, TagDto>();
         }
     }
 }
