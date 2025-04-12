@@ -327,7 +327,7 @@ namespace MoneyManagerService.Controllers
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.APISecrect));
 
-            if (key.KeySize < 128)
+            if (key.KeySize < 512)
             {
                 throw new Exception("API Secret must be longer");
             }

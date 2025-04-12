@@ -10,7 +10,7 @@
       "request": "launch",
       "preLaunchTask": "build",
       // If you have changed target frameworks, make sure to update the program path.
-      "program": "${workspaceFolder}/MoneyManagerService/bin/Debug/netcoreapp3.1/MoneyManagerService.dll",
+      "program": "${workspaceFolder}/MoneyManagerService/bin/Debug/net8.0/MoneyManagerService.dll",
       "args": [],
       "cwd": "${workspaceFolder}/MoneyManagerService",
       "stopAtEntry": false,
