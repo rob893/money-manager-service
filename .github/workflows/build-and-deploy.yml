@@ -21,13 +21,13 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Use Dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
       - name: Use cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
@@ -38,7 +38,7 @@ jobs:
           cd ./MoneyManagerService
           dotnet publish -c=Release -o dist
       - name: Upload build
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: money-manager-service-b${{ github.run_number }}
           path: ./MoneyManagerService/dist
@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
       - name: Install SSH key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -61,7 +61,7 @@ jobs:
       - name: Download secret settings file
         run: scp ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:/var/www/html/APIs/SettingsFiles/MoneyManagerService/appsettings.Secrets.json ./money-manager-service-b${{ github.run_number }}
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'rherber-money-manager-service'
           slot-name: 'production'
