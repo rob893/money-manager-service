@@ -168,7 +168,7 @@ namespace MoneyManagerService.Controllers
         [HttpPost("{id}/tags")]
         public async Task<ActionResult<ExpenseDto>> AddTagsToExpenseAsync([FromRoute] int id, [FromBody] List<string> tagsToAdd)
         {
-            if (tagsToAdd.IsNullOrEmpty())
+            if (tagsToAdd == null || tagsToAdd.Count == 0)
             {
                 return this.BadRequest("At least one tag must be in the request.");
             }

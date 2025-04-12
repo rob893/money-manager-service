@@ -246,7 +246,7 @@ dotnet_diagnostic.CA5404.severity = none
 # Something about logging templates?
 # Disabled because I don't know what it is talking about.
 dotnet_diagnostic.CA2254.severity = none
-
+dotnet_diagnostic.CA1724.severity = none
 
 [/WoWMarketWatcher.API.Test/**]
 dotnet_diagnostic.CA1707.severity = none
